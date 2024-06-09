@@ -1,5 +1,5 @@
-// login_view.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loop/auth/auth_repo.dart';
@@ -348,11 +348,13 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
               _passwordField(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  _forgotPassword(),
-                ],
+              SingleChildScrollView(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _forgotPassword(),
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top:20.0),

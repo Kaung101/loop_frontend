@@ -85,7 +85,7 @@ Future<void> logoutUser(String token) async {
         'email': email,
       }),
     );
-    if(response.statusCode == 200){
+    if(response.body == 'true'){
       return true;
     }else{
       return false;
