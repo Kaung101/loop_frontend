@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
+import 'package:loop/components/bottomNavigatioon.dart';
 import 'package:loop/components/colors.dart';
 
 class ProfileView extends StatefulWidget {
@@ -55,6 +57,16 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
+        leading: IconButton(
+          icon: const Icon(CupertinoIcons.back, color: AppColors.textColor),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const BottomNav(),
+              ),
+            );
+          },
+        ),
         title: Align(
           alignment: Alignment.topLeft,
           child: Text(_username ?? 'Profile'),
@@ -213,99 +225,101 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _editProfileSection() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      child: SizedBox(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.backgroundColor,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.textColor),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'Edit Profile',
-                    style: TextStyle(color: AppColors.textColor),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: () {},
-                        ),
-                      ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        child: SizedBox(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundColor,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.textColor),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Edit Profile',
+                      style: TextStyle(color: AppColors.textColor),
                     ),
-                  ),
-                ],
-              ),
-              const Divider(color: AppColors.primaryColor),
-              Row(
-                children: [
-                  const Text(
-                    'Change Password',
-                    style: TextStyle(color: AppColors.textColor),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: () {},
-                        ),
-                      ],
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.chevron_right),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const Divider(color: AppColors.primaryColor),
-              Row(
-                children: [
-                  const Text(
-                    'Delete My Account',
-                    style: TextStyle(color: AppColors.textColor),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: _showDeleteAccountDialog,
-                        ),
-                      ],
+                  ],
+                ),
+                const Divider(color: AppColors.primaryColor),
+                Row(
+                  children: [
+                    const Text(
+                      'Change Password',
+                      style: TextStyle(color: AppColors.textColor),
                     ),
-                  ),
-                ],
-              ),
-              const Divider(color: AppColors.primaryColor),
-              Row(
-                children: [
-                  const Text(
-                    'Sign Out',
-                    style: TextStyle(color: AppColors.textColor),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: _signOut,
-                        ),
-                      ],
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.chevron_right),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                const Divider(color: AppColors.primaryColor),
+                Row(
+                  children: [
+                    const Text(
+                      'Delete My Account',
+                      style: TextStyle(color: AppColors.textColor),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.chevron_right),
+                            onPressed: _showDeleteAccountDialog,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.primaryColor),
+                Row(
+                  children: [
+                    const Text(
+                      'Sign Out',
+                      style: TextStyle(color: AppColors.textColor),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.chevron_right),
+                            onPressed: _signOut,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

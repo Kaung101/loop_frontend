@@ -104,9 +104,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+               _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
               ),
               color: AppColors.primaryColor,
               style: ButtonStyle(
@@ -153,9 +151,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+                _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
               ),
               color: AppColors.primaryColor,
               style: ButtonStyle(
@@ -350,7 +346,7 @@ class _SignUpViewState extends State<SignUpView> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Passowrd',
+                    Text('Password',
                         style: TextStyle(
                             color: AppColors.textColor, fontSize: 13)),
                   ],

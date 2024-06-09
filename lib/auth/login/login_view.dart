@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loop/auth/auth_repo.dart';
+import 'package:loop/auth/forgotpwd/forgotpwd.dart';
 import 'package:loop/auth/login/login_bloc.dart';
 import 'package:loop/auth/login/login_event.dart';
 import 'package:loop/auth/login/login_state.dart';
@@ -94,7 +95,7 @@ class _LoginViewState extends State<LoginView> {
               padding: const EdgeInsets.only(right: 10.0),
               child: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 ),
                 color: AppColors.primaryColor,
                 style: ButtonStyle(
@@ -157,7 +158,33 @@ class _LoginViewState extends State<LoginView> {
           },
         ),
       ),
-      onPressed: () {},
+      onPressed: () {
+        //show modal on middle of the page
+        showDialog(
+          context: context,
+           builder: (BuildContext context){
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: AppColors.backgroundColor,
+                content :const SingleChildScrollView(
+                  child:  SizedBox(
+                    width: 800,
+                    height: 350,
+                    child:  Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                         ForgotPasswordModal()
+                      ],
+                    ),
+                  ),
+                ),
+              );
+           }
+        );
+      },
       child: const Text(
         "Forgot Password?",
         style: TextStyle(color: AppColors.textColor, fontSize: 13),

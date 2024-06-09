@@ -25,6 +25,8 @@ class AuthRepository {
 
   return '';
   }
+  
+
   Future<void> signUp({
     required String username,
     required String email,
@@ -74,6 +76,22 @@ Future<void> logoutUser(String token) async {
       return false;
     }
   }
+  //checkEmail
+  Future<bool> checkExistEmail({required String email}) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/auth/checkEmail'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+      }),
+    );
+    if(response.statusCode == 200){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  
   Future<String?> getAuthToken() async {
     return await storage.read(key: 'jwtToken');
   }
