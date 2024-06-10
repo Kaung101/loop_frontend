@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loop/auth/auth_repo.dart';
@@ -168,19 +167,20 @@ class _LoginViewState extends State<LoginView> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 backgroundColor: AppColors.backgroundColor,
-                content :const SingleChildScrollView(
-                  child:  SizedBox(
+                content :const SizedBox(
                     width: 800,
                     height: 350,
-                    child:  Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                         ForgotPasswordModal()
-                      ],
+                    child:  SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                           ForgotPasswordModal()
+                        ],
+                      ),
                     ),
                   ),
-                ),
+               // ),
               );
            }
         );

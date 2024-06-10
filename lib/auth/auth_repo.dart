@@ -109,36 +109,19 @@ Future<void> logoutUser(String token) async {
     }
     return null;
   }
-
-  // Future<void> followUser(String token, String followeeId) async {
-  //   final response = await http.post(
-  //     Uri.parse('$baseUrl/api/auth/follow'),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer $token',
-  //     },
-  //     body: jsonEncode({'followeeId': followeeId}),
-  //   );
-
-  //   if (response.statusCode != 200) {
-  //     throw Exception('Failed to follow user');
-  //   }
-  // }
-
-  // Future<void> unfollowUser(String token, String followeeId) async {
-  //   final response = await http.post(
-  //     Uri.parse('$baseUrl/api/auth/unfollow'),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer $token',
-  //     },
-  //     body: jsonEncode({'followeeId': followeeId}),
-  //   );
-
-  //   if (response.statusCode != 200) {
-  //     throw Exception('Failed to unfollow user');
-  //   }
-  // }
-
-  
+  //update password
+  Future<bool> updatePassoword({required String email, required String password}) async{
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/auth/updatePassword'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+      }),
+    );
+    if(response.body == 'true'){
+      return true;
+  }  
+  return false;
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:loop/components/bottomNavigatioon.dart';
 import 'package:loop/showlist.dart';
 
 class Nav extends StatefulWidget {
