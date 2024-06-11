@@ -2,9 +2,11 @@ import 'dart:async'; //needed to use Timer to set default time for loading scree
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/post_management/create_post.dart';
 import '../../components/colors.dart'; // Assuming this file defines your app colors
 
 class SplashScreen extends StatefulWidget {
@@ -45,11 +47,11 @@ class _SplashScreenState extends State<SplashScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Handle potential image loading errors
-                Image.asset(
-                  'image/logo.png', 
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Text('Error loading splash image'); // Placeholder
-                  },
+                SvgPicture.asset(
+                  'image/loop_logo.svg', 
+                  // errorBuilder: (context, error, stackTrace) {
+                  //   return const Text('Error loading splash image'); // Placeholder
+                  // },
                 ),
                 const SizedBox(width: 10.0), // Add space between image and text
               ],
@@ -74,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       MaterialPageRoute(builder: (context) =>  RepositoryProvider(
         create: (context) => AuthRepository(),
-        child: isLoggedIn ? const BottomNav() : const LoginView(),
+        child: isLoggedIn ? const BottomNav() : const CreatePost(),
       )),
     );
   }

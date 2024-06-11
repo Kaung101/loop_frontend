@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/components/nav.dart';
+import 'package:loop/post_management/create_post.dart';
 import 'package:loop/showlist.dart';
 import 'package:loop/user_management/view_profile.dart';
 
@@ -17,7 +18,7 @@ class _BottomNavState extends State<BottomNav> {
 
   final List<Widget> screens = [
     const HomeScreen(),
-    const Nav(), 
+    const CreatePost(), 
     const ProfileView(),
   ];
 
