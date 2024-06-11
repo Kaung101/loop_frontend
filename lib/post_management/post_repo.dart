@@ -47,21 +47,7 @@ class PostRepository {
     } catch (e) {
       print(e);
     }
-
-    // final response = await http.post(
-    //   Uri.parse('$baseUrl/post'),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': "Bearer $readKey"
-    //   },
-    //   body: jsonEncode(
-    //       {'name': name, 'price': price, 'description': description}),
-    // );
-
-    // if (response.statusCode == 400) {
-    //   final errorMessage = jsonDecode(response.data) as Map<String, dynamic>;
-    //   return errorMessage["message"];
-    // }
+    
     return '';
   }
 }
