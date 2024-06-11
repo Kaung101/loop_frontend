@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
-import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 
 class ProfileView extends StatefulWidget {

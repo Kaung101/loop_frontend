@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loop/auth/auth_repo.dart';
@@ -330,60 +332,66 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 8, right: 8, bottom: 5),
-                        child: TextFormField(
-                          controller: _emailController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter an email address';
-                            } else if (!emailRegex.hasMatch(value)) {
-                              return 'Please enter a valid email address';
-                            } else if (errorMessage.isNotEmpty) {
-                              return errorMessage;
-                            }
-                            return null;
-                          },
-                          onChanged: (value) {
-                            setState(() {
-                              errorMessage = '';
-                            });
-                          },
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(
-                                color: AppColors.primaryColor.withOpacity(0.5)),
-                            fillColor: AppColors.backgroundColor,
-                            filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              borderSide: BorderSide.none,
+                      SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8, right: 8, bottom: 5),
+                          child: TextFormField(
+                            controller: _emailController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter an email address';
+                              } else if (!emailRegex.hasMatch(value)) {
+                                return 'Please enter a valid email address';
+                              } else if (errorMessage.isNotEmpty) {
+                                return errorMessage;
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                errorMessage = '';
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(
+                                  color:
+                                      AppColors.primaryColor.withOpacity(0.5)),
+                              fillColor: AppColors.backgroundColor,
+                              filled: true,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                                borderSide: const BorderSide(
+                                    color: Colors
+                                        .red), // Custom border color for validation error
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
                             ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              borderSide: const BorderSide(
-                                  color: Colors
-                                      .red), // Custom border color for validation error
-                            ),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      SizedBox(
-                        width: 160,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _handleSendEmail,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                          child: const Text(
-                            'Next',
-                            style: TextStyle(
-                              color: AppColors.backgroundColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17.0,
+                      SingleChildScrollView(
+                        child: SizedBox(
+                          width: 160,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _handleSendEmail,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                            ),
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(
+                                color: AppColors.backgroundColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17.0,
+                              ),
                             ),
                           ),
                         ),
@@ -420,39 +428,43 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 8, right: 8, bottom: 5),
-                        child: TextFormField(
-                          controller: _otpcontroller,
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(
-                                color: AppColors.primaryColor.withOpacity(0.5)),
-                            fillColor: AppColors.backgroundColor,
-                            filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              borderSide: BorderSide.none,
+                      SingleChildScrollView(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8, right: 8, bottom: 5),
+                          child: TextFormField(
+                            controller: _otpcontroller,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(
+                                  color: AppColors.primaryColor.withOpacity(0.5)),
+                              fillColor: AppColors.backgroundColor,
+                              filled: true,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
                             ),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      SizedBox(
-                        width: 160,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                          onPressed: _handleVerifyOtp,
-                          child: const Text(
-                            'Next',
-                            style: TextStyle(
-                              color: AppColors.backgroundColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 17.0,
+                      SingleChildScrollView(
+                        child: SizedBox(
+                          width: 160,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                            ),
+                            onPressed: _handleVerifyOtp,
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(
+                                color: AppColors.backgroundColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17.0,
+                              ),
                             ),
                           ),
                         ),
@@ -475,112 +487,118 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 15),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 8, right: 8, bottom: 5),
-                        child: TextFormField(
-                          obscureText: passwordVisibleOne,
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(
-                                color: AppColors.primaryColor.withOpacity(0.5)),
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 35.0, right: 15.0),
-                              child: Icon(Icons.lock_outline,
-                                  color:
-                                      AppColors.primaryColor.withOpacity(0.5)),
+                      SingleChildScrollView(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8, right: 8, bottom: 5),
+                          child: TextFormField(
+                            obscureText: passwordVisibleOne,
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(
+                                  color: AppColors.primaryColor.withOpacity(0.5)),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 35.0, right: 15.0),
+                                child: Icon(Icons.lock_outline,
+                                    color:
+                                        AppColors.primaryColor.withOpacity(0.5)),
+                              ),
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 15.0),
+                                child: IconButton(
+                                    icon: Icon(
+                                      passwordVisibleOne
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        passwordVisibleOne = !passwordVisibleOne;
+                                      });
+                                    }),
+                              ),
+                              fillColor: AppColors.backgroundColor,
+                              filled: true,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              labelText: 'Password',
                             ),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 15.0),
-                              child: IconButton(
-                                  icon: Icon(
-                                    passwordVisibleOne
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      passwordVisibleOne = !passwordVisibleOne;
-                                    });
-                                  }),
-                            ),
-                            fillColor: AppColors.backgroundColor,
-                            filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            labelText: 'Password',
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 8, right: 8, bottom: 5),
-                        child: TextFormField(
-                          obscureText: passwordVisibleTwo,
-                          controller: _confirmPasswordController,
-                          decoration: InputDecoration(
-                            labelStyle: TextStyle(
-                                color: AppColors.primaryColor.withOpacity(0.5)),
-                            prefixIcon: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 35.0, right: 15.0),
-                              child: Icon(Icons.lock_outline,
-                                  color:
-                                      AppColors.primaryColor.withOpacity(0.5)),
+                      SingleChildScrollView(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8, right: 8, bottom: 5),
+                          child: TextFormField(
+                            obscureText: passwordVisibleTwo,
+                            controller: _confirmPasswordController,
+                            decoration: InputDecoration(
+                              labelStyle: TextStyle(
+                                  color: AppColors.primaryColor.withOpacity(0.5)),
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 35.0, right: 15.0),
+                                child: Icon(Icons.lock_outline,
+                                    color:
+                                        AppColors.primaryColor.withOpacity(0.5)),
+                              ),
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 15.0),
+                                child: IconButton(
+                                    icon: Icon(
+                                      passwordVisibleTwo
+                                          ? Icons.visibility_off_outlined
+                                          : Icons.visibility_outlined,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        passwordVisibleTwo = !passwordVisibleTwo;
+                                      });
+                                    }),
+                              ),
+                              fillColor: AppColors.backgroundColor,
+                              filled: true,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: const BorderSide(
+                                    color: Colors
+                                        .red), // Custom border color for validation error
+                              ),
+                              floatingLabelBehavior: FloatingLabelBehavior.never,
+                              labelText: 'Confirm Password',
                             ),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 15.0),
-                              child: IconButton(
-                                  icon: Icon(
-                                    passwordVisibleTwo
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      passwordVisibleTwo = !passwordVisibleTwo;
-                                    });
-                                  }),
-                            ),
-                            fillColor: AppColors.backgroundColor,
-                            filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              borderSide: const BorderSide(
-                                  color: Colors
-                                      .red), // Custom border color for validation error
-                            ),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            labelText: 'Confirm Password',
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      SizedBox(
-                        width: 160,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _handleResetPassword,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                          child: const Text(
-                            'Reset',
-                            style: TextStyle(
-                                color: AppColors.backgroundColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17.0),
+                      SingleChildScrollView(
+                        child: SizedBox(
+                          width: 160,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _handleResetPassword,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                            ),
+                            child: const Text(
+                              'Reset',
+                              style: TextStyle(
+                                  color: AppColors.backgroundColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17.0),
+                            ),
                           ),
                         ),
                       ),

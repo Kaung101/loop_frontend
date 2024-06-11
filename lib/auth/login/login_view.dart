@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,7 +8,7 @@ import 'package:loop/auth/login/login_bloc.dart';
 import 'package:loop/auth/login/login_event.dart';
 import 'package:loop/auth/login/login_state.dart';
 import 'package:loop/auth/signup/signup_view.dart';
-import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import '../../components/colors.dart';
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -60,43 +61,216 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Widget _emailField() {
-    return BlocBuilder<LoginBloc, LoginState>(
-      builder: (context, state) {
-        return SingleChildScrollView(
-          child: TextFormField(
+    return SingleChildScrollView(
+      child: BlocBuilder<LoginBloc, LoginState>(
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: TextFormField(
+              decoration: InputDecoration(
+                fillColor: AppColors.backgroundColor,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              validator: (value) => state.isValidEmail ? null : "Invalid Email",
+              onChanged: (value) => context.read<LoginBloc>().add(LoginemailChanged(email: value)),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _passwordField() {
+    return SingleChildScrollView(
+      child: BlocBuilder<LoginBloc, LoginState>(
+        builder: (context, state) {
+          return TextFormField(
+            obscureText: _obscurePassword,
             decoration: InputDecoration(
               fillColor: AppColors.backgroundColor,
               filled: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
+              suffixIcon: Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  ),
+                  color: AppColors.primaryColor,
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.transparent;
+                        }
+                        if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                          return Colors.transparent;
+                        }
+                        return null; // Defer to the widget's default.
+                      },
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
             ),
-            validator: (value) => state.isValidEmail ? null : "Invalid Email",
-            onChanged: (value) => context.read<LoginBloc>().add(LoginemailChanged(email: value)),
-          ),
-        );
-      },
+            validator:(value){
+      
+              if(value!.isEmpty){
+                return 'Password is required';
+              }
+              else if(errormsg.isNotEmpty){
+                return 'Incorrect Password';
+              }
+              else if(state.errorMessage.isNotEmpty){
+                print(state.errorMessage);
+                return state.errorMessage;
+              }
+      
+              return null;
+            
+            } ,
+            //validator: (value) => state.isValidPassword ? null : "Invalid Password",
+            onChanged: (value) => context.read<LoginBloc>().add(LoginPasswordChanged(password: value)),
+            
+          );
+        },
+      ),
     );
   }
 
-  Widget _passwordField() {
-    return BlocBuilder<LoginBloc, LoginState>(
-      builder: (context, state) {
-        return TextFormField(
-          obscureText: _obscurePassword,
-          decoration: InputDecoration(
-            fillColor: AppColors.backgroundColor,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            suffixIcon: Padding(
-              padding: const EdgeInsets.only(right: 10.0),
-              child: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                ),
-                color: AppColors.primaryColor,
+  Widget _forgotPassword() {
+    return SingleChildScrollView(
+      child: TextButton(
+        style: ButtonStyle(
+          overlayColor: MaterialStateProperty.resolveWith<Color?>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.hovered)) {
+                return Colors.transparent;
+              }
+              if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                return Colors.transparent;
+              }
+              return null; // Defer to the widget's default.
+            },
+          ),
+        ),
+        onPressed: () {
+          //show modal on middle of the page
+          showDialog(
+            context: context,
+             builder: (BuildContext context){
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  backgroundColor: AppColors.backgroundColor,
+                  content :const SizedBox(
+                      width: 800,
+                      height: 350,
+                      child:  SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                             ForgotPasswordModal()
+                          ],
+                        ),
+                      ),
+                    ),
+                 // ),
+                );
+             }
+          );
+        },
+        child: const Text(
+          "Forgot Password?",
+          style: TextStyle(color: AppColors.textColor, fontSize: 13),
+        ),
+      ),
+    );
+  }
+
+  Widget _loginButton() {
+    return SingleChildScrollView(
+      child: BlocBuilder<LoginBloc, LoginState>(
+        builder: (context, state) {
+          return SizedBox(
+                  width: 160.0,
+                  height: 40.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () async {
+                      errormsg = await authRepo.login(email: state.email, password: state.password);
+                      if (_formKey.currentState!.validate()) {
+                         // ignore: use_build_context_synchronously
+                         context.read<LoginBloc>().add(LoginSubmitted());
+                        Fluttertoast.showToast(
+                      msg: "Account Login Successfully",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      webPosition: "center",
+                      webBgColor: '#B8BF7B',
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: AppColors.tertiaryColor,
+                      textColor: AppColors.backgroundColor,
+                      fontSize: 16.0);
+                        Future.delayed(const Duration(seconds: 1),(){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RepositoryProvider(
+                          create: (context) => AuthRepository(),
+                          child: const BottomNav(),
+                        ),
+                      ),
+                    );
+                  
+                  });
+                        
+                      }
+                    },
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                        color: AppColors.backgroundColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w200,
+                      ),
+                    ),
+                  ),
+                );
+        },
+      
+      ),
+    );
+  }
+
+  Widget _donothaveAccount() {
+    return Expanded(
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Don't have an account?",
+                style: TextStyle(color: AppColors.textColor, fontSize: 13),
+              ),
+              TextButton(
                 style: ButtonStyle(
                   overlayColor: MaterialStateProperty.resolveWith<Color?>(
                     (Set<MaterialState> states) {
@@ -111,190 +285,26 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
                 onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-            ),
-          ),
-          validator:(value){
-
-            if(value!.isEmpty){
-              return 'Password is required';
-            }
-            else if(errormsg.isNotEmpty){
-              return 'Incorrect Password';
-            }
-            else if(state.errorMessage.isNotEmpty){
-              print(state.errorMessage);
-              return state.errorMessage;
-            }
-
-            return null;
-          
-          } ,
-          //validator: (value) => state.isValidPassword ? null : "Invalid Password",
-          onChanged: (value) => context.read<LoginBloc>().add(LoginPasswordChanged(password: value)),
-          
-        );
-      },
-    );
-  }
-
-  Widget _forgotPassword() {
-    return TextButton(
-      style: ButtonStyle(
-        overlayColor: MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.hovered)) {
-              return Colors.transparent;
-            }
-            if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
-              return Colors.transparent;
-            }
-            return null; // Defer to the widget's default.
-          },
-        ),
-      ),
-      onPressed: () {
-        //show modal on middle of the page
-        showDialog(
-          context: context,
-           builder: (BuildContext context){
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                backgroundColor: AppColors.backgroundColor,
-                content :const SizedBox(
-                    width: 800,
-                    height: 350,
-                    child:  SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                           ForgotPasswordModal()
-                        ],
-                      ),
-                    ),
-                  ),
-               // ),
-              );
-           }
-        );
-      },
-      child: const Text(
-        "Forgot Password?",
-        style: TextStyle(color: AppColors.textColor, fontSize: 13),
-      ),
-    );
-  }
-
-  Widget _loginButton() {
-    return BlocBuilder<LoginBloc, LoginState>(
-      builder: (context, state) {
-        return SizedBox(
-                width: 160.0,
-                height: 40.0,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () async {
-                    errormsg = await authRepo.login(email: state.email, password: state.password);
-                    if (_formKey.currentState!.validate()) {
-                       // ignore: use_build_context_synchronously
-                       context.read<LoginBloc>().add(LoginSubmitted());
-                      Fluttertoast.showToast(
-                    msg: "Account Login Successfully",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    webPosition: "center",
-                    webBgColor: '#B8BF7B',
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: AppColors.tertiaryColor,
-                    textColor: AppColors.backgroundColor,
-                    fontSize: 16.0);
-                      Future.delayed(const Duration(seconds: 1),(){
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => RepositoryProvider(
                         create: (context) => AuthRepository(),
-                        child: const BottomNav(),
+                        child: SignUpView(),
                       ),
                     ),
                   );
-                
-                });
-                      
-                    }
-                  },
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(
-                      color: AppColors.backgroundColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w200,
-                    ),
-                  ),
-                ),
-              );
-      },
-
-    );
-  }
-
-  Widget _donothaveAccount() {
-    return Expanded(
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Don't have an account?",
-              style: TextStyle(color: AppColors.textColor, fontSize: 13),
-            ),
-            TextButton(
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.hovered)) {
-                      return Colors.transparent;
-                    }
-                    if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
-                      return Colors.transparent;
-                    }
-                    return null; // Defer to the widget's default.
-                  },
+                },
+                child: const Text(
+                  "Sign Up",
+                  style: TextStyle(color: AppColors.primaryColor, fontSize: 13),
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RepositoryProvider(
-                      create: (context) => AuthRepository(),
-                      child: SignUpView(),
-                    ),
-                  ),
-                );
-              },
-              child: const Text(
-                "Sign Up",
-                style: TextStyle(color: AppColors.primaryColor, fontSize: 13),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    //);
   }
 
 
@@ -307,14 +317,16 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: Container(
-                  height: 100,
-                  margin: const EdgeInsets.only(top: 200),
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('image/logo.png'),
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Container(
+                    height: 100,
+                    margin: const EdgeInsets.only(top: 200),
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('image/logo.png'),
+                      ),
                     ),
                   ),
                 ),
