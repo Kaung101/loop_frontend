@@ -1,10 +1,9 @@
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/bottomNavigatioon.dart';
 import 'package:loop/components/colors.dart';
@@ -12,6 +11,7 @@ import 'package:loop/post_management/create_post_bloc.dart';
 import 'package:loop/post_management/create_post_event.dart';
 import 'package:loop/post_management/create_post_state.dart';
 import 'package:loop/post_management/post_repo.dart';
+import 'package:mime/mime.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({super.key});
@@ -24,11 +24,45 @@ class _CreatePostState extends State<CreatePost> {
   final _formKey = GlobalKey<FormState>();
   final PostRepository postRepository = PostRepository();
   String errormsg = '';
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _descController = TextEditingController();
-  Uint8List? _beforePhoto;
-  Uint8List? _afterPhoto;
+
+  bool status = true;
+
+
+  Widget _statusField(){
+
+    return BlocBuilder<CreatePostBloc, CreatePostState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            RadioListTile<bool>(  
+              title: const Text('Looking for artist'),        
+              value: false, 
+              groupValue: status, 
+              onChanged: (bool? st) {
+                setState(() {
+                  status = st!;
+                });
+                 context.read<CreatePostBloc>().add(PostStatusChanged(status: false));
+
+              },
+            ),
+
+            RadioListTile<bool>(  
+              title: const Text('Upcycled by me'),        
+              value: true, 
+              groupValue: status, 
+              onChanged: (bool? st) {
+                setState(() {
+                  status = st!;
+                });
+                context.read<CreatePostBloc>().add(PostStatusChanged(status: true));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget _nameField() {
     return BlocBuilder<CreatePostBloc, CreatePostState>(
@@ -88,6 +122,86 @@ class _CreatePostState extends State<CreatePost> {
     });
   }
 
+  Widget _beforePhotoButton() {
+    return BlocBuilder<CreatePostBloc, CreatePostState>(
+      builder: (context, state) {
+        return SizedBox(
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              // backgroundColor: AppColors.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            icon: Transform.rotate(
+              angle: 45 * 3.1427 / 180,
+              child:
+                  const Icon(Icons.attach_file, color: AppColors.primaryColor),
+            ),
+            onPressed: () async {
+              final ImagePicker imagePicker = ImagePicker();
+              final pickedFile =
+                  await imagePicker.pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                context
+                    .read<CreatePostBloc>()
+                    .add(BeforePhotoChanged(beforePhoto: pickedFile));
+              }
+            },
+            label: const Text(
+              "Attach",
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _afterPhotoButton() {
+    return BlocBuilder<CreatePostBloc, CreatePostState>(
+      builder: (context, state) {
+        return SizedBox(
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              // backgroundColor: AppColors.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            icon: Transform.rotate(
+              angle: 45 * 3.1427 / 180,
+              child:
+                  const Icon(Icons.attach_file, color: AppColors.primaryColor),
+            ),
+            onPressed: () async {
+              final ImagePicker imagePicker = ImagePicker();
+              final pickedFile =
+                  await imagePicker.pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                context
+                    .read<CreatePostBloc>()
+                    .add(AfterPhotoChanged(afterPhoto: pickedFile));
+              }
+            },
+            label: const Text(
+              "Attach",
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _postButton() {
     return BlocBuilder<CreatePostBloc, CreatePostState>(
       builder: (context, state) {
@@ -103,9 +217,12 @@ class _CreatePostState extends State<CreatePost> {
             ),
             onPressed: () async {
               errormsg = await postRepository.createPost(
+                  status: state.status,
                   name: state.name,
                   price: state.price,
-                  description: state.description);
+                  description: state.description,
+                  beforePhoto: state.beforePhoto!,
+                  afterPhoto: state.afterPhoto!);
               if (_formKey.currentState!.validate()) {
                 // ignore: use_build_context_synchronously
                 context.read<CreatePostBloc>().add(PostSubmitted());
@@ -117,8 +234,12 @@ class _CreatePostState extends State<CreatePost> {
                     webPosition: "center",
                     webBgColor: '#B8BF7B',
                     timeInSecForIosWeb: 1,
-                    backgroundColor: errormsg == '' ? AppColors.tertiaryColor : AppColors.warningColor,
-                    textColor: errormsg == '' ? AppColors.backgroundColor : AppColors.textColor,
+                    backgroundColor: errormsg == ''
+                        ? AppColors.tertiaryColor
+                        : AppColors.warningColor,
+                    textColor: errormsg == ''
+                        ? AppColors.backgroundColor
+                        : AppColors.textColor,
                     fontSize: 16.0);
 
                 if (errormsg == '') {
@@ -139,9 +260,9 @@ class _CreatePostState extends State<CreatePost> {
             child: const Text(
               "Post",
               style: TextStyle(
-                color: AppColors.backgroundColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w200,
+                color: Color.fromARGB(255, 255, 255, 255),
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -175,72 +296,96 @@ class _CreatePostState extends State<CreatePost> {
           create: (_) => CreatePostBloc(postRepo: postRepository),
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.fromLTRB(30, 20, 30, 20),
               child: Form(
                 key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 40),
-                        child: Container(
-                          height: 100,
-                          margin: const EdgeInsets.only(top: 200),
-                        ),
+                child: Column(
+                  children: [
+                    _statusField(),
+
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Product Name",
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textColor),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Product Name",
-                              style: TextStyle(
-                                  fontSize: 13, color: AppColors.textColor),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                    ),
+                    _nameField(),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Estimate Price",
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textColor),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      _nameField(),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Estimate Price",
-                              style: TextStyle(
-                                  fontSize: 13, color: AppColors.textColor),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                    ),
+                    _priceField(),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Description",
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textColor),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      _priceField(),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Description",
-                              style: TextStyle(
-                                  fontSize: 13, color: AppColors.textColor),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                    ),
+                    _descField(),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Upload Original Product Photo",
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textColor),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      _descField(),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: _postButton(),
+                    ),
+                    Row(children: [
+                      _beforePhotoButton(),
+                    ]),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0, top: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Upload Reference or ‘After’ Product Photo",
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textColor),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Row(children: [_afterPhotoButton()]),
+                     Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: _postButton(),
+                    ),
+                  ],
                 ),
               ),
             ),

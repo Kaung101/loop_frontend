@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/post_management/create_post.dart';
 import '../../components/colors.dart'; // Assuming this file defines your app colors
 
 class SplashScreen extends StatefulWidget {
@@ -75,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       MaterialPageRoute(builder: (context) =>  RepositoryProvider(
         create: (context) => AuthRepository(),
-        child: isLoggedIn ? const BottomNav() : const LoginView(),
+        child: isLoggedIn ? const BottomNav() : const CreatePost(),
       )),
     );
   }

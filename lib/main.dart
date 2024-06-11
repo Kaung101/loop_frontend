@@ -10,7 +10,6 @@ import 'package:loop/post_management/create_post_bloc.dart';
 void main() {
   final authRepository = AuthRepository();
   final postRepository = PostRepository();
-
   //runApp(const MyApp());
   runApp(
     MultiProvider(
