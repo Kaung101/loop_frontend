@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loop/auth/auth_repo.dart';
-import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/post_management/create_post_bloc.dart';
 import 'package:loop/post_management/create_post_event.dart';
