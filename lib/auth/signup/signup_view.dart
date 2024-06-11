@@ -308,7 +308,7 @@ class _SignUpViewState extends State<SignUpView> {
                     // margin: const EdgeInsets.only(top: 170),
                     decoration: const BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('image/logo.png'),
+                        image: AssetImage('image/loop_logo.svg'),
                       ),
                     ),
                   ),

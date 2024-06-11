@@ -314,7 +314,7 @@ class _LoginViewState extends State<LoginView> {
                   margin: const EdgeInsets.only(top: 200),
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('image/logo.png'),
+                      image: AssetImage('image/loop_logo.svg'),
                     ),
                   ),
                 ),

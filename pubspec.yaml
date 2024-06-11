@@ -71,7 +71,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - image/logo.png
     - image/loop_logo.svg
   # To add assets to your application, add an assets section, like this:
   # assets:
