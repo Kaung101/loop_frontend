@@ -46,8 +46,20 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
     emit(state.copyWith(formStatus: FormSubmitting()));
 
     try {
-      await postRepo.createPost(status: state.status, name: state.name, price: state.price, description: state.description, beforePhoto: state.beforePhoto!, afterPhoto: state.afterPhoto!);
-      emit(state.copyWith(formStatus: SubmissionSuccess()));
+      final errorMsg = await postRepo.createPost(
+        status: state.status, 
+        name: state.name, 
+        price: state.price, 
+        description: state.description, 
+        beforePhoto: state.beforePhoto!, 
+        afterPhoto: state.afterPhoto!
+      );
+      if(errorMsg == '') {
+        emit(state.copyWith(formStatus: SubmissionSuccess()));
+      } else {
+        emit(state.copyWith(formStatus: SubmissionFailed(Exception(errorMsg)), errorMessage: errorMsg));
+      }
+      
     } on Exception catch (e) {
       emit(state.copyWith(formStatus: SubmissionFailed(e), errorMessage: e.toString()));
     }

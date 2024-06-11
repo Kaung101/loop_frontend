@@ -23,8 +23,6 @@ class CreatePost extends StatefulWidget {
 class _CreatePostState extends State<CreatePost> {
   final _formKey = GlobalKey<FormState>();
   final PostRepository postRepository = PostRepository();
-  String errormsg = '';
-
   bool status = true;
 
 
@@ -216,33 +214,26 @@ class _CreatePostState extends State<CreatePost> {
               ),
             ),
             onPressed: () async {
-              errormsg = await postRepository.createPost(
-                  status: state.status,
-                  name: state.name,
-                  price: state.price,
-                  description: state.description,
-                  beforePhoto: state.beforePhoto!,
-                  afterPhoto: state.afterPhoto!);
               if (_formKey.currentState!.validate()) {
                 // ignore: use_build_context_synchronously
                 context.read<CreatePostBloc>().add(PostSubmitted());
                 Fluttertoast.showToast(
                     msg:
-                        errormsg == '' ? "Post Created Successfully" : errormsg,
+                        state.errorMessage == '' ? "Post Created Successfully" : state.errorMessage,
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
                     webPosition: "center",
                     webBgColor: '#B8BF7B',
                     timeInSecForIosWeb: 1,
-                    backgroundColor: errormsg == ''
+                    backgroundColor: state.errorMessage == ''
                         ? AppColors.tertiaryColor
                         : AppColors.warningColor,
-                    textColor: errormsg == ''
+                    textColor: state.errorMessage == ''
                         ? AppColors.backgroundColor
                         : AppColors.textColor,
                     fontSize: 16.0);
 
-                if (errormsg == '') {
+                if (state.errorMessage == '') {
                   Future.delayed(const Duration(seconds: 1), () {
                     Navigator.push(
                       context,
