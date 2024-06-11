@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/auth/signup/signup_bloc.dart';
@@ -307,23 +308,17 @@ class _SignUpViewState extends State<SignUpView> {
       key: _formKey,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 100),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 100),
-                child: SingleChildScrollView(
-                  child: Container(
-                    height: 100,
-                    // margin: const EdgeInsets.only(top: 170),
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('image/loop_logo.svg'),
-                      ),
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'image/loop_logo.svg',
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 20),
               const Padding(

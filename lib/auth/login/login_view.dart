@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/forgotpwd/forgotpwd.dart';
@@ -313,21 +314,17 @@ class _LoginViewState extends State<LoginView> {
       key: _formKey,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20),
+          padding: const EdgeInsets.only(left: 20, right: 20, top : 200),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: Container(
-                  height: 100,
-                  margin: const EdgeInsets.only(top: 200),
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('image/loop_logo.svg'),
-                    ),
+               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'image/loop_logo.svg',
                   ),
-                ),
+                ],
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 10.0),
