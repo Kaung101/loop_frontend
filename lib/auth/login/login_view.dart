@@ -317,16 +317,14 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Container(
-                    height: 100,
-                    margin: const EdgeInsets.only(top: 200),
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('image/logo.png'),
-                      ),
+              Padding(
+                padding: const EdgeInsets.only(top: 40),
+                child: Container(
+                  height: 100,
+                  margin: const EdgeInsets.only(top: 200),
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('image/loop_logo.svg'),
                     ),
                   ),
                 ),
