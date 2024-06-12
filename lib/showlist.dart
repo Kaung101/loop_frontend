@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +11,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthRepository authRepository = AuthRepository();
+  
+  //get all post future method and return post data
+  Future<List<dynamic>> getAllPost() async {
+    final postList = await authRepository.fetchAllPost();
+    return postList.map((post) => PostWidget(
+      username: post['user_name'],
+      userImage: (post['user_img'] != null )? post['user_img'] : 'image/logo.png', // Replace with actual data if available
+      postImageOne: 'http://localhost:3000/${post['original_photo']}${post['original_photoType']}', // Replace with actual data if available
+      postImageTwo: 'http://localhost:3000/${post['reference_photo']}${post['reference_photoType']}', // Replace with actual data if available
+      status: 'Looking for artist', // Replace with actual data if available
+      productName: post['name'],
+      productPrice: post['price'],
+      description: post['description'],
+    )).toList();
+  }
+
+  //get 
 
   @override
   Widget build(BuildContext context) {
@@ -19,71 +37,69 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.backgroundColor,
         title: Container(
-          margin:const EdgeInsets.only(top: 5.0),
-          child:TextField(
-              decoration: InputDecoration(
-                hintText: 'Search',
-                suffixIcon: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
-                    elevation: MaterialStateProperty.all<double>(0.0),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+          margin: const EdgeInsets.only(top: 5.0),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search',
+              suffixIcon: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
+                  elevation: MaterialStateProperty.all<double>(0.0),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
-                  onPressed: (){},
-                  child: const Icon(CupertinoIcons.search, color: AppColors.textColor,),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const  BorderSide(color: AppColors.textColor),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide:const  BorderSide(color: AppColors.textColor),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide:const  BorderSide(color: AppColors.textColor),
-                ),
-                filled: true,
-                fillColor: AppColors.backgroundColor,
-                contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 18.0),
+                onPressed: () {},
+                child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
               ),
-              style:const TextStyle(color: AppColors.textColor),
-              cursorColor: AppColors.textColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: AppColors.textColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: AppColors.textColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: AppColors.textColor),
+              ),
+              filled: true,
+              fillColor: AppColors.backgroundColor,
+              contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 18.0),
             ),
-          //),
-        ),
-       
-      ),
-      body:const SingleChildScrollView(
-        child:  SizedBox(
-          height: 500,
-          child:  PostWidget(
-            postId: '1',
-            userId: '1',
-            username: 'Username',
-            userImage: 'https://example.com/profile_image.jpg',
-            postImageOne: 'https://example.com/original_product.jpg',
-            postImageTwo: 'https://example.com/reference_product.jpg',
-            status: 'Looking for artist',
-            productName: 'ProductA',
-            productPrice: '800-1000 ฿',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            style: const TextStyle(color: AppColors.textColor),
+            cursorColor: AppColors.textColor,
           ),
         ),
+      ),
+      body: FutureBuilder<List<dynamic>>(
+        future: getAllPost(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No posts found'));
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return snapshot.data![index];
+              },
+            );
+          }
+        },
       ),
     );
   }
 }
-
 class PostWidget extends StatelessWidget {
-  final String postId;
-  final String userId;
+  //final String postId;
+  //final String userId;
   final String username;
   final String userImage;
   final String postImageOne;
@@ -95,8 +111,8 @@ class PostWidget extends StatelessWidget {
 
   const PostWidget({
     super.key, 
-    required this.postId,
-    required this.userId,
+    //required this.postId,
+   // required this.userId,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -109,183 +125,192 @@ class PostWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  SingleChildScrollView(
-      child: Padding(
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+          side: const BorderSide(color: AppColors.textColor, width: 1.0), // Set border color and width
+        ),
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(userImage),
+                  ),
+                  const SizedBox(width: 5),
+                  TextButton(
+                  style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.transparent;
+                      }
+                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return null; // Defer to the widget's default.
+                    },
+                  ),
+                ),
+                    onPressed: (){
+
+                    },
+                     child: Text(
+                    username,
+                    style:const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w300,
+                      color: AppColors.textColor
+                    ),
+                  ),
+                    )
+
+                ],
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(
-                              'https://example.com/profile_image.jpg'), // replace with your image URL
+                        Image.network(
+                          postImageOne,
+                          height: 100,
                         ),
-                        SizedBox(width: 16),
+                        Text('Original Product'),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Image.network(
+                          postImageTwo,
+                          height: 100,
+                        ),
+                        Text('Reference'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          'Username',
+                          'Status: ',
                           style: TextStyle(
-                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    Row(
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Image.network(
-                                'https://example.com/original_product.jpg', // replace with your image URL
-                                height: 100,
-                              ),
-                              Text('Original Product'),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Image.network(
-                                'https://example.com/reference_product.jpg', // replace with your image URL
-                                height: 100,
-                              ),
-                              Text('Reference'),
-                            ],
-                          ),
-                        ),
+                        Text('• $status'),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Status: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('• Looking for artist'),
-                            ],
-                          ),
-                        ),
-                      ],
-                    
-                    ),
-                    SizedBox(height: 8),
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Product Name: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('• ProductA'),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Price: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('• 800-1000 ฿'),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Description: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '• Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Product Name: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('• $productName'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Price: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('• $productPrice ฿'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Description: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '• $description',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }
-
-    
-  
-
