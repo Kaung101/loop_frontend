@@ -25,6 +25,21 @@ class _ProfileViewState extends State<ProfileView> {
     _fetchUserData();
   }
 
+  // Get all post future method and return post data
+  Future<List<dynamic>> getAllPost() async {
+    final postList = await _authRepository.fetchOwnerPost();
+    return postList.map((post) => PostWidget(
+      username: post['user_name'],
+      userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png', // Replace with actual data if available
+      postImageOne: 'http://localhost:3000/${post['original_photo']}${post['original_photoType']}', // Replace with actual data if available
+      postImageTwo: 'http://localhost:3000/${post['reference_photo']}${post['reference_photoType']}', // Replace with actual data if available
+      status: 'Looking for artist', // Replace with actual data if available
+      productName: post['name'],
+      productPrice: post['price'],
+      description: post['description'],
+    )).toList();
+  }
+
   Future<void> _fetchUserData() async {
     try {
       final userData = await _authRepository.fetchUserData();
@@ -64,14 +79,15 @@ class _ProfileViewState extends State<ProfileView> {
           child: Text(_username ?? 'Profile'),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      body: SingleChildScrollView(
         child: Column(
           children: [
             _followerSection(),
             const SizedBox(height: 20),
-            const SizedBox(height: 20),
             _editProfileSection(),
+            const SizedBox(height: 20),
+             ShowOwnerPost(),
+            //),
           ],
         ),
       ),
@@ -91,7 +107,7 @@ class _ProfileViewState extends State<ProfileView> {
         const SizedBox(width: 40),
         const Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:  [
+          children: [
             Text(
               '123',
               style: TextStyle(
@@ -116,7 +132,7 @@ class _ProfileViewState extends State<ProfileView> {
         const SizedBox(width: 60),
         const Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:  [
+          children: [
             Text(
               '321',
               style: TextStyle(
@@ -217,26 +233,36 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _editProfileSection() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        child: SizedBox(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.backgroundColor,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.textColor),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Edit Profile',
-                      style: TextStyle(color: AppColors.textColor),
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      child: SizedBox(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.textColor),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    'Edit Profile',
+                    style: TextStyle(color: AppColors.textColor),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: () {},
+                        ),
+                      ],
                     ),
+                  ),
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -255,74 +281,151 @@ class _ProfileViewState extends State<ProfileView> {
                         ],
                       ),
                     ),
-                  ],
-                ),
-                const Divider(color: AppColors.primaryColor),
-                Row(
-                  children: [
-                    const Text(
-                      'Change Password',
-                      style: TextStyle(color: AppColors.textColor),
+                ],
+              ),
+              const Divider(color: AppColors.primaryColor),
+              Row(
+                children: [
+                  const Text(
+                    'Delete My Account',
+                    style: TextStyle(color: AppColors.textColor),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: _showDeleteAccountDialog,
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
+                  ),
+                ],
+              ),
+              const Divider(color: AppColors.primaryColor),
+              Row(
+                children: [
+                  const Text(
+                    'Sign Out',
+                    style: TextStyle(color: AppColors.textColor),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: _signOut,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const Divider(color: AppColors.primaryColor),
-                Row(
-                  children: [
-                    const Text(
-                      'Delete My Account',
-                      style: TextStyle(color: AppColors.textColor),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right),
-                            onPressed: _showDeleteAccountDialog,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const Divider(color: AppColors.primaryColor),
-                Row(
-                  children: [
-                    const Text(
-                      'Sign Out',
-                      style: TextStyle(color: AppColors.textColor),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right),
-                            onPressed: _signOut,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
 
+class ShowOwnerPost extends StatelessWidget {
+  final AuthRepository _authRepository = AuthRepository();
+
+  Future<List<dynamic>> getAllPost() async {
+    final postList = await _authRepository.fetchOwnerPost();
+    return postList.map((post) => PostWidget(
+      username: post['user_name'],
+      userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png',
+      postImageOne: 'http://localhost:3000/${post['original_photo']}${post['original_photoType']}',
+      postImageTwo: 'http://localhost:3000/${post['reference_photo']}${post['reference_photoType']}',
+      status: 'Looking for artist',
+      productName: post['name'],
+      productPrice: post['price'],
+      description: post['description'],
+    )).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<dynamic>>(
+      future: getAllPost(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No posts available'));
+        } else {
+          final posts = snapshot.data!;
+           return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              return posts[index];
+            },
+          );
+        }
+      },
+    );
+  }
+}
+
+class PostWidget extends StatelessWidget {
+  final String username;
+  final String userImage;
+  final String postImageOne;
+  final String postImageTwo;
+  final String status;
+  final String productName;
+  final String productPrice;
+  final String description;
+
+  const PostWidget({
+    Key? key,
+    required this.username,
+    required this.userImage,
+    required this.postImageOne,
+    required this.postImageTwo,
+    required this.status,
+    required this.productName,
+    required this.productPrice,
+    required this.description,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(userImage),
+            ),
+            title: Text(username),
+            subtitle: Text(status),
+          ),
+          Image.network(postImageOne),
+          Image.network(postImageTwo),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(productName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('\$$productPrice'),
+                Text(description),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

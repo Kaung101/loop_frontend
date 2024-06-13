@@ -137,30 +137,16 @@ Future<void> logoutUser(String token) async {
       return [];
     }
   }
-
-//get userId from postId
-  Future<String> fetchUserIdFromPostId({required String postId}) async {
+ //get all post data
+  Future<List<dynamic>> fetchOwnerPost() async {
     final response = await http.get(
-      Uri.parse('$baseUrl/show/userId/$postId'),
+      Uri.parse('$baseUrl/owner/allPost'),
       headers: {'Content-Type': 'application/json'},
     );
     if(response.statusCode == 200){
       return jsonDecode(response.body);
     }else{
-      return '';
-    }
-  }
-  
-  //get user data from userId
-  Future<Map<String, dynamic>> fetchUserDataFromUserId({required String userId}) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/show/user/$userId'),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if(response.statusCode == 200){
-      return jsonDecode(response.body);
-    }else{
-      return {};
+      return [];
     }
   }
 
