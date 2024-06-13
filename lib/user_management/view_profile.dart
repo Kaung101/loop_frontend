@@ -4,6 +4,7 @@ import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
+import 'package:loop/user_management/edit_profile.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -57,16 +58,7 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.back, color: AppColors.textColor),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const BottomNav(),
-              ),
-            );
-          },
-        ),
+        automaticallyImplyLeading: false,
         title: Align(
           alignment: Alignment.topLeft,
           child: Text(_username ?? 'Profile'),
@@ -251,7 +243,14 @@ class _ProfileViewState extends State<ProfileView> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.chevron_right),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const EditProfile(),
+                                  settings: const RouteSettings(name: '/editProfile'),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
