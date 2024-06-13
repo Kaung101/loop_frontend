@@ -37,22 +37,25 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.backgroundColor,
         title: Container(
-          margin: const EdgeInsets.only(top: 5.0),
+          margin: const EdgeInsets.only(top: 1.0),
           child: TextField(
             decoration: InputDecoration(
               hintText: 'Search',
-              suffixIcon: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
-                  elevation: MaterialStateProperty.all<double>(0.0),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+              suffixIcon: Container(
+                margin: const EdgeInsets.only(right: 10.0),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
+                    elevation: MaterialStateProperty.all(0),
+                    // shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    //   RoundedRectangleBorder(
+                    //     borderRadius: BorderRadius.circular(10.0),
+                    //   ),
+                    // ),
                   ),
+                  onPressed: () {},
+                  child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
                 ),
-                onPressed: () {},
-                child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),

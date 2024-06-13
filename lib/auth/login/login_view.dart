@@ -249,7 +249,7 @@ class _LoginViewState extends State<LoginView> {
                       style: TextStyle(
                         color: AppColors.backgroundColor,
                         fontSize: 16,
-                        fontWeight: FontWeight.w200,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
