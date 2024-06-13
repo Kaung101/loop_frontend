@@ -31,8 +31,8 @@ class _ProfileViewState extends State<ProfileView> {
     return postList.map((post) => PostWidget(
       username: post['user_name'],
       userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png', // Replace with actual data if available
-      postImageOne: 'http://localhost:3000/${post['original_photo']}${post['original_photoType']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/${post['reference_photo']}${post['reference_photoType']}', // Replace with actual data if available
+      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
       status: 'Looking for artist', // Replace with actual data if available
       productName: post['name'],
       productPrice: post['price'],
