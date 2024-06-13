@@ -339,8 +339,8 @@ class ShowOwnerPost extends StatelessWidget {
     return postList.map((post) => PostWidget(
       username: post['user_name'],
       userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png',
-      postImageOne: 'http://localhost:3000/${post['original_photo']}${post['original_photoType']}',
-      postImageTwo: 'http://localhost:3000/${post['reference_photo']}${post['reference_photoType']}',
+      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}',
       status: 'Looking for artist',
       productName: post['name'],
       productPrice: post['price'],
