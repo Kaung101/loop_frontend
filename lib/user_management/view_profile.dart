@@ -57,7 +57,9 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
-        leading: IconButton(
+
+        automaticallyImplyLeading: false,
+        /* leading: IconButton(
           icon: const Icon(CupertinoIcons.back, color: AppColors.textColor),
           onPressed: () {
             Navigator.of(context).pushReplacement(
@@ -66,7 +68,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             );
           },
-        ),
+        ), */
         title: Align(
           alignment: Alignment.topLeft,
           child: Text(_username ?? 'Profile'),
