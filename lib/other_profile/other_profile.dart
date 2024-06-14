@@ -1,13 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
-class OtherProfile extends StatefulWidget {
-  const OtherProfile({super.key});
+class OtherProfile extends StatelessWidget {
+  final String userId;
+  const OtherProfile({super.key, required this.userId});
 
-  @override
-  State<OtherProfile> createState() => _OtherProfileState();
-}
-
-class _OtherProfileState extends State<OtherProfile> {
   @override
   Widget build(BuildContext context) {
     return const Placeholder();

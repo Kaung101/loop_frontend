@@ -52,7 +52,7 @@ dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "image/logo.png"
+  image_path: "image/appIcon.png"
 
 
 dev_dependencies:
@@ -80,6 +80,7 @@ flutter:
   assets:
     - image/loop_logo.svg
     - image/logo.png
+    - image/appIcon.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
