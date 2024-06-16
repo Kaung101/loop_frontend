@@ -150,4 +150,21 @@ Future<void> logoutUser(String token) async {
     }
   }
 
+  //edit profile
+  Future<bool> editProfile({required String firstName, required String lastName, required String username, required String email}) async{
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/auth/editProfile'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'firstName': firstName,
+        'lastName': lastName,
+        'username': username,}),
+    );
+    if(response.body == 'true'){
+      return true;
+  }  
+  return false;
+  }
+
 }

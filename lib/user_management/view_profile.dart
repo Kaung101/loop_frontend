@@ -5,6 +5,7 @@ import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/user_management/edit_profile.dart';
+import 'package:loop/user_management/change_password.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -23,21 +24,6 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     _fetchUserData();
-  }
-
-  // Get all post future method and return post data
-  Future<List<dynamic>> getAllPost() async {
-    final postList = await _authRepository.fetchOwnerPost();
-    return postList.map((post) => PostWidget(
-      username: post['user_name'],
-      userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png', // Replace with actual data if available
-      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
-      status: 'Looking for artist', // Replace with actual data if available
-      productName: post['name'],
-      productPrice: post['price'],
-      description: post['description'],
-    )).toList();
   }
 
   Future<void> _fetchUserData() async {
@@ -297,7 +283,14 @@ class _ProfileViewState extends State<ProfileView> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.chevron_right),
-                          onPressed: (){},
+                          onPressed: (){
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const ChangePw(),
+                                  settings: const RouteSettings(name: '/changePw'),
+                                ),
+                              );
+                          },
                         ),
                       ],
                     ),
@@ -362,7 +355,7 @@ class ShowOwnerPost extends StatelessWidget {
       userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png',
       postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
       postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}',
-      status: 'Looking for artist',
+      status: post['artist_post'] == true ? 'Looking for artist' : 'Upcycled by Me',
       productName: post['name'],
       productPrice: post['price'],
       description: post['description'],
@@ -480,7 +473,11 @@ class PostWidget extends StatelessWidget {
                   ),
                     ),
                     const Spacer(),
-                    DropDown(),                 
+                    DropDown(),
+                    IconButton(
+                          icon: const Icon(CupertinoIcons.delete),
+                          onPressed: (){},
+                        ),            
                 ],
               ),
               SizedBox(height: 8),
@@ -637,15 +634,15 @@ class DropDownState extends State<DropDown> {
   String dropdownValue = 'Show Post';
   final List<String> _items = [
     'Show Post',
-    'Hide From Feed',
-    'Delete Post',
+    'Hide from Feed',
+    //'Delete Post',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150,
-      height: 40,
+      width: 120,
+      height: 24,
       decoration: BoxDecoration(
         //filled: false,
         //color: AppColors.backgroundColor,
@@ -658,7 +655,7 @@ class DropDownState extends State<DropDown> {
           icon: const Icon(Icons.keyboard_arrow_down),
           iconSize: 24,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 12,
             color: AppColors.textColor,
           ),
           /* underline: Container(
