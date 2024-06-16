@@ -5,6 +5,7 @@ import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/user_management/edit_profile.dart';
+import 'package:loop/user_management/change_password.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -23,21 +24,6 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     _fetchUserData();
-  }
-
-  // Get all post future method and return post data
-  Future<List<dynamic>> getAllPost() async {
-    final postList = await _authRepository.fetchOwnerPost();
-    return postList.map((post) => PostWidget(
-      username: post['user_name'],
-      userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png', // Replace with actual data if available
-      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
-      status: 'Looking for artist', // Replace with actual data if available
-      productName: post['name'],
-      productPrice: post['price'],
-      description: post['description'],
-    )).toList();
   }
 
   Future<void> _fetchUserData() async {
@@ -87,6 +73,7 @@ class _ProfileViewState extends State<ProfileView> {
             _editProfileSection(),
             const SizedBox(height: 20),
              ShowOwnerPost(),
+             //dropDown()
             //),
           ],
         ),
@@ -252,7 +239,7 @@ class _ProfileViewState extends State<ProfileView> {
                     'Edit Profile',
                     style: TextStyle(color: AppColors.textColor),
                   ),
-                  Expanded(
+                  /* Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -262,7 +249,7 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ],
                     ),
-                  ),
+                  ), */
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -281,6 +268,33 @@ class _ProfileViewState extends State<ProfileView> {
                         ],
                       ),
                     ),
+                ],
+              ),
+              const Divider(color: AppColors.primaryColor),
+              Row(
+                children: [
+                  const Text(
+                    'Change Password',
+                    style: TextStyle(color: AppColors.textColor),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: (){
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const ChangePw(),
+                                  settings: const RouteSettings(name: '/changePw'),
+                                ),
+                              );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const Divider(color: AppColors.primaryColor),
@@ -341,7 +355,7 @@ class ShowOwnerPost extends StatelessWidget {
       userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png',
       postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
       postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}',
-      status: 'Looking for artist',
+      status: post['artist_post'] == true ? 'Looking for artist' : 'Upcycled by Me',
       productName: post['name'],
       productPrice: post['price'],
       description: post['description'],
@@ -375,7 +389,10 @@ class ShowOwnerPost extends StatelessWidget {
   }
 }
 
+
 class PostWidget extends StatelessWidget {
+  //final String postId;
+  //final String userId;
   final String username;
   final String userImage;
   final String postImageOne;
@@ -385,8 +402,10 @@ class PostWidget extends StatelessWidget {
   final String productPrice;
   final String description;
 
-  const PostWidget({
-    Key? key,
+   const PostWidget({
+    super.key, 
+    //required this.postId,
+   // required this.userId,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -395,36 +414,266 @@ class PostWidget extends StatelessWidget {
     required this.productName,
     required this.productPrice,
     required this.description,
-  }) : super(key: key);
+  });
+
+  /* final String _drowdownValue = 'Show Post';
+  var _items = [
+    'Show Post',
+    'Hide From Feed',
+    'Delete Post',
+  ];
+ */
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Card(
+        color: AppColors.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          side: const BorderSide(color: AppColors.textColor, width: 1.0), // Set border color and width
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundImage: NetworkImage(userImage),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton(
+                  style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.transparent;
+                      }
+                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return null; // Defer to the widget's default.
+                    },
+                  ),
+                ),
+                    onPressed: (){
+
+                    },
+                     child: Text(
+                    username,
+                    style:const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColor
+                    ),
+                  ),
+                    ),
+                    const Spacer(),
+                    DropDown(),
+                    IconButton(
+                          icon: const Icon(CupertinoIcons.delete),
+                          onPressed: (){},
+                        ),            
+                ],
+              ),
+              SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Image.network(
+                            postImageOne,
+                            height: 100,
+                          ),
+                          Text('Original Product'),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 0),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Image.network(
+                            postImageTwo,
+                            height: 100,
+                          ),
+                          Text('Reference'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Status: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('• $status'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Product Name: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('• $productName'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Price: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('• $productPrice ฿'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Description: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '• $description',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DropDown extends StatefulWidget {
+  @override
+  DropDownState createState() => DropDownState();
+}
+
+class DropDownState extends State<DropDown> {
+  String dropdownValue = 'Show Post';
+  final List<String> _items = [
+    'Show Post',
+    'Hide from Feed',
+    //'Delete Post',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(userImage),
-            ),
-            title: Text(username),
-            subtitle: Text(status),
+    return Container(
+      width: 120,
+      height: 24,
+      decoration: BoxDecoration(
+        //filled: false,
+        //color: AppColors.backgroundColor,
+        border: Border.all(color: AppColors.textColor, width: 1.0),      
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Center(
+        child: DropdownButton<String>(
+          value: dropdownValue,
+          icon: const Icon(Icons.keyboard_arrow_down),
+          iconSize: 24,
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textColor,
           ),
-          Image.network(postImageOne),
-          Image.network(postImageTwo),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(productName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text('\$$productPrice'),
-                Text(description),
-              ],
-            ),
-          ),
-        ],
+          /* underline: Container(
+            height: 2,
+            color: AppColors.primaryColor,
+          ), */
+          onChanged: (String? newValue) {
+            setState(() {
+              dropdownValue = newValue!;
+            });
+          },
+          items: _items.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
