@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'package:loop/other_profile/other_profile.dart';
 class AuthRepository {
   final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:3000');
   final storage = const  FlutterSecureStorage();
@@ -132,6 +133,7 @@ Future<void> logoutUser(String token) async {
       headers: {'Content-Type': 'application/json'},
     );
     if(response.statusCode == 200){
+      print(response.body);
       return jsonDecode(response.body);
     }else{
       return [];
@@ -147,6 +149,32 @@ Future<void> logoutUser(String token) async {
       return jsonDecode(response.body);
     }else{
       return [];
+    }
+  }
+  //get other profile post
+  Future<List<dynamic>> otherProfilePost({required String userId}) async {
+    print("hello $userId");
+    final response = await http.get(
+      Uri.parse('$baseUrl/show/otherProfilePost/$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if(response.statusCode == 200){
+      return jsonDecode(response.body);
+    }else{
+      return [];
+    }
+  }
+
+  //fetch other profile user data
+  Future<Map<String, dynamic>?> fetchOtherProfileData({required String userId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/auth/getUserById/$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if(response.statusCode == 200){
+      return jsonDecode(response.body);
+    }else{
+      return null;
     }
   }
 
