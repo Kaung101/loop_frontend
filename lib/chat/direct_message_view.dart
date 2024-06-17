@@ -6,7 +6,7 @@ import 'package:loop/chat/chat_event.dart';
 import 'package:loop/chat/chat_state.dart';
 import 'package:loop/chat/received_message_bubble.dart';
 import 'package:loop/chat/sent_message_bubble.dart';
-import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'package:tuple/tuple.dart';
 

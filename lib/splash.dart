@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
-import 'package:loop/components/bottomNavigatioon.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import '../../components/colors.dart'; // Assuming this file defines your app colors
 
 class SplashScreen extends StatefulWidget {

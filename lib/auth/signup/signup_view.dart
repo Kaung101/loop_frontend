@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/auth/signup/signup_bloc.dart';
@@ -39,206 +41,216 @@ class _SignUpViewState extends State<SignUpView> {
   }
 
   Widget _usernameField() {
-    return BlocBuilder<SignUpBloc, SignUpState>(
-      builder: (context, state) {
-        return TextFormField(
-          decoration: InputDecoration(
-            fillColor: AppColors.backgroundColor,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+    return SingleChildScrollView(
+      child: BlocBuilder<SignUpBloc, SignUpState>(
+        builder: (context, state) {
+          return TextFormField(
+            decoration: InputDecoration(
+              fillColor: AppColors.backgroundColor,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
-          validator: (value) {
-            if (state.isValidUsername) {
-              return null;
-            } else if (state.errorMessage.isNotEmpty) {
-              return state.errorMessage;
-            }
-            return "Invalid Username";
-          },
-          onChanged: (value) => context
-              .read<SignUpBloc>()
-              .add(SignUpUsernameChanged(username: value)),
-        );
-      },
+            validator: (value) {
+              if (state.isValidUsername) {
+                return null;
+              } else if (state.errorMessage.isNotEmpty) {
+                return state.errorMessage;
+              }
+              return "Invalid Username";
+            },
+            onChanged: (value) => context
+                .read<SignUpBloc>()
+                .add(SignUpUsernameChanged(username: value)),
+          );
+        },
+      ),
     );
   }
 
   Widget _emailField() {
-    return BlocBuilder<SignUpBloc, SignUpState>(
-      builder: (context, state) {
-        return TextFormField(
-          decoration: InputDecoration(
-            fillColor: AppColors.backgroundColor,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+    return SingleChildScrollView(
+      child: BlocBuilder<SignUpBloc, SignUpState>(
+        builder: (context, state) {
+          return TextFormField(
+            decoration: InputDecoration(
+              fillColor: AppColors.backgroundColor,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-          ),
-          validator: (value) {
-            if (state.isValidEmail) {
-              return null;
-            } else if (state.errorMessage.isNotEmpty) {
-              return state.errorMessage;
-            }
-            return "Invalid Email";
-          },
-          onChanged: (value) =>
-              context.read<SignUpBloc>().add(SignUpEmailChanged(email: value)),
-        );
-      },
+            validator: (value) {
+              if (state.isValidEmail) {
+                return null;
+              } else if (state.errorMessage.isNotEmpty) {
+                return state.errorMessage;
+              }
+              return "Invalid Email";
+            },
+            onChanged: (value) =>
+                context.read<SignUpBloc>().add(SignUpEmailChanged(email: value)),
+          );
+        },
+      ),
     );
   }
 
   Widget _passwordField() {
-    return BlocBuilder<SignUpBloc, SignUpState>(
-      builder: (context, state) {
-        return TextFormField(
-          obscureText: _obscurePassword,
-          decoration: InputDecoration(
-            fillColor: AppColors.backgroundColor,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-               _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+    return SingleChildScrollView(
+      child: BlocBuilder<SignUpBloc, SignUpState>(
+        builder: (context, state) {
+          return TextFormField(
+            obscureText: _obscurePassword,
+            decoration: InputDecoration(
+              fillColor: AppColors.backgroundColor,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              color: AppColors.primaryColor,
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.hovered)) {
-                      return Colors.transparent;
-                    }
-                    if (states.contains(MaterialState.focused) ||
-                        states.contains(MaterialState.pressed)) {
-                      return Colors.transparent;
-                    }
-                    return null; // Defer to the widget's default.
-                  },
+              suffixIcon: IconButton(
+                icon: Icon(
+                 _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 ),
+                color: AppColors.primaryColor,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.transparent;
+                      }
+                      if (states.contains(MaterialState.focused) ||
+                          states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return null; // Defer to the widget's default.
+                    },
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
               ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
             ),
-          ),
-          validator: (value) =>
-              state.isValidPassword ? null : 'Invalid Password',
-          onChanged: (value) => context
-              .read<SignUpBloc>()
-              .add(SignUpPasswordChanged(password: value)),
-        );
-      },
+            validator: (value) =>
+                state.isValidPassword ? null : 'Invalid Password',
+            onChanged: (value) => context
+                .read<SignUpBloc>()
+                .add(SignUpPasswordChanged(password: value)),
+          );
+        },
+      ),
     );
   }
 
   Widget _confirmPasswordField() {
-    return BlocBuilder<SignUpBloc, SignUpState>(
-      builder: (context, state) {
-        return TextFormField(
-          obscureText: _obscureConfirmPassword,
-          decoration: InputDecoration(
-            fillColor: AppColors.backgroundColor,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+    return SingleChildScrollView(
+      child: BlocBuilder<SignUpBloc, SignUpState>(
+        builder: (context, state) {
+          return TextFormField(
+            obscureText: _obscureConfirmPassword,
+            decoration: InputDecoration(
+              fillColor: AppColors.backgroundColor,
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              color: AppColors.primaryColor,
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.hovered)) {
-                      return Colors.transparent;
-                    }
-                    if (states.contains(MaterialState.focused) ||
-                        states.contains(MaterialState.pressed)) {
-                      return Colors.transparent;
-                    }
-                    return null; // Defer to the widget's default.
-                  },
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 ),
+                color: AppColors.primaryColor,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.transparent;
+                      }
+                      if (states.contains(MaterialState.focused) ||
+                          states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return null; // Defer to the widget's default.
+                    },
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                  });
+                },
               ),
-              onPressed: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
             ),
-          ),
-          validator: (value) =>
-              state.isPasswordMatch ? null : 'Passwords do not match',
-          onChanged: (value) => context
-              .read<SignUpBloc>()
-              .add(SignUpConfirmPasswordChanged(confirmPassword: value)),
-        );
-      },
+            validator: (value) =>
+                state.isPasswordMatch ? null : 'Passwords do not match',
+            onChanged: (value) => context
+                .read<SignUpBloc>()
+                .add(SignUpConfirmPasswordChanged(confirmPassword: value)),
+          );
+        },
+      ),
     );
   }
 
   Widget _signUpButton() {
-    return BlocBuilder<SignUpBloc, SignUpState>(
-      builder: (context, state) {
-        if (state.formStatus is SubmissionFailed) {
-          print(state.errorMessage);
-        }
-        return SizedBox(
-          width: 160.0,
-          height: 40.0,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+    return SingleChildScrollView(
+      child: BlocBuilder<SignUpBloc, SignUpState>(
+        builder: (context, state) {
+          if (state.formStatus is SubmissionFailed) {
+            print(state.errorMessage);
+          }
+          return SizedBox(
+            width: 160.0,
+            height: 40.0,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-            ),
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                context.read<SignUpBloc>().add(SignUpSubmitted());
-                Fluttertoast.showToast(
-                    msg: "Account Signin Successfully",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    webPosition: "center",
-                    webBgColor: '#B8BF7B',
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: AppColors.tertiaryColor,
-                    textColor: AppColors.backgroundColor,
-                    fontSize: 16.0);
-                Future.delayed(const Duration(seconds: 1),(){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RepositoryProvider(
-                        create: (context) => AuthRepository(),
-                        child: const LoginView(),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  context.read<SignUpBloc>().add(SignUpSubmitted());
+                  Fluttertoast.showToast(
+                      msg: "Account Signin Successfully",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      webPosition: "center",
+                      webBgColor: '#B8BF7B',
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: AppColors.tertiaryColor,
+                      textColor: AppColors.backgroundColor,
+                      fontSize: 16.0);
+                  Future.delayed(const Duration(seconds: 1),(){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RepositoryProvider(
+                          create: (context) => AuthRepository(),
+                          child: const LoginView(),
+                        ),
                       ),
-                    ),
-                  );
-                
-                });
-              }
-            },
-            child: const Text(
-              'Sign Up',
-              style: TextStyle(
-                color: AppColors.backgroundColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w200,
+                    );
+                  
+                  });
+                }
+              },
+              child: const Text(
+                'Sign Up',
+                style: TextStyle(
+                  color: AppColors.backgroundColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w200,
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -296,23 +308,17 @@ class _SignUpViewState extends State<SignUpView> {
       key: _formKey,
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 100),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 100),
-                child: SingleChildScrollView(
-                  child: Container(
-                    height: 100,
-                    // margin: const EdgeInsets.only(top: 170),
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('image/logo.png'),
-                      ),
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    'image/loop_logo.svg',
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 20),
               const Padding(
