@@ -8,11 +8,12 @@ import 'package:loop/chat/received_message_bubble.dart';
 import 'package:loop/chat/sent_message_bubble.dart';
 import 'package:loop/components/bottomNavigatioon.dart';
 import 'package:loop/components/colors.dart';
+import 'package:tuple/tuple.dart';
 
 class DirectMessageView extends StatefulWidget {
   const DirectMessageView({super.key, required this.userId});
 
-  final String userId;
+  final Tuple2<String, String> userId;
 
   @override
   State<DirectMessageView> createState() => _DirectMessageViewState();
@@ -22,8 +23,9 @@ class _DirectMessageViewState extends State<DirectMessageView> {
   final TextEditingController _chatInputController = TextEditingController();
 
   List<Widget> _buildMessage(ChatState state) {
+    print(widget.userId);
     return List.from(state.messages[widget.userId]!.map((message) {
-      if (message.from == widget.userId) {
+      if (message.from == widget.userId.item1) {
         return ReceivedMessageBubble(message: message.content);
       } else {
         return SentMessageBubble(message: message.content);
@@ -46,19 +48,19 @@ class _DirectMessageViewState extends State<DirectMessageView> {
             );
           },
         ),
-        title: const Align(
+        title: Align(
           alignment: Alignment.topLeft,
           child: Row(children: [
             Padding(
-                padding: EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(right: 10),
                 child: CircleAvatar(
                   backgroundColor: AppColors.primaryColor,
                   child: Text(
-                    'U',
-                    style: TextStyle(color: AppColors.backgroundColor),
+                    widget.userId.item2.substring(0, 2).toUpperCase(),
+                    style: const TextStyle(color: AppColors.backgroundColor),
                   ),
                 )),
-            Text('User')
+            Text(widget.userId.item2)
           ]),
         ),
       ),
@@ -99,7 +101,8 @@ class _DirectMessageViewState extends State<DirectMessageView> {
                       )),
                   onEditingComplete: () async {
                     context.read<ChatBloc>().add(SendMessage(
-                        content: _chatInputController.text, to: widget.userId));
+                        content: _chatInputController.text, to: widget.userId.item1, toUser: widget.userId.item2));
+                    _chatInputController.text = '';
                   },
                 ),
               ],

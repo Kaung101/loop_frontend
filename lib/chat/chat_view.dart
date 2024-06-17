@@ -16,11 +16,11 @@ class _CreateChatViewState extends State<ChatView> {
   List<Widget> _listTileBuilder(ChatState state) {
     return List.from(state.messages.keys.map(
       (userId) => ListTile(
-          title: Text(userId),
-          leading: const CircleAvatar(
+          title: Text(userId.item2),
+          leading: CircleAvatar(
             backgroundColor: AppColors.primaryColor,
-            child:
-                Text('U', style: TextStyle(color: AppColors.backgroundColor)),
+            child: Text(userId.item2.substring(0, 2).toUpperCase(),
+                style: const TextStyle(color: AppColors.backgroundColor)),
           ),
           onTap: () => Navigator.push(
               context,

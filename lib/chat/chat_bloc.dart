@@ -7,6 +7,7 @@ import 'package:loop/chat/chat_state.dart';
 import 'package:loop/util/jwt.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:tuple/tuple.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository chatRepo;
@@ -43,16 +44,18 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<void> _onReceiveMessage(
       ReceiveMessage event, Emitter<ChatState> emit) async {
-    Map<String, List<Message>> originalMessages = Map.from(state.messages);
-    if (!originalMessages.containsKey(event.from)) {
+    Map<Tuple2<String, String>, List<Message>> originalMessages = Map.from(state.messages);
+    final key = Tuple2<String, String>(event.from, event.fromUser);
+    if (!originalMessages.containsKey(key)) {
       List<Message> emptyList = [];
-      originalMessages.addEntries([MapEntry(event.from, emptyList)]);
+      originalMessages.addEntries([MapEntry(Tuple2.fromList([event.from, event.fromUser]), emptyList)]);
     }
 
-    final messagesOfUser = originalMessages[event.from];
+    final messagesOfUser = originalMessages[Tuple2.fromList([event.from, event.fromUser])];
     final messageToAdd = Message(
         to: await getUserId(),
         from: event.from,
+        fromUser: event.fromUser,
         content: event.content,
         type: MessageType.text);
 
@@ -64,23 +67,30 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   void _onSocketReceiveMessage(data) {
-    add(ReceiveMessage(content: data['content'], from: data['from']));
+    add(ReceiveMessage(
+        content: data['content'],
+        from: data['from'],
+        fromUser: data['from_user']));
   }
 
   Future<void> _onSendMessage(
       SendMessage event, Emitter<ChatState> emit) async {
-    Map<String, List<Message>> originalMessages = Map.from(state.messages);
-    if (!originalMessages.containsKey(event.to)) {
+    Map<Tuple2<String, String>, List<Message>> originalMessages = Map.from(state.messages);
+
+    final key = Tuple2<String, String>(event.to, event.toUser);
+    if (!originalMessages.containsKey(key)) {
       List<Message> emptyList = [];
-      originalMessages.addEntries([MapEntry(event.to, emptyList)]);
+      originalMessages.addEntries([MapEntry(key, emptyList)]);
     }
 
-    final messagesOfUser = originalMessages[event.to];
+    final messagesOfUser = originalMessages[key];
     final messageToAdd = Message(
-        from: await getUserId(),
+        from: '',                             // server will read jwt token and add the info
+        fromUser: '',                         // server will read jwt token and add the info
         to: event.to,
         content: event.content,
         type: MessageType.text);
+
     messagesOfUser!.add(messageToAdd);
 
     emit(state.copyWith(

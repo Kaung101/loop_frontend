@@ -7,3 +7,11 @@ Future<String> getUserId() async {
 
   return tokenBody['id'];
 }
+
+Future<String> getUsername() async {
+  final token = await const FlutterSecureStorage().read(key: 'jwtToken');
+  final tokenBody = Jwt.parseJwt(token!);
+
+  return tokenBody['username'];
+}
+
