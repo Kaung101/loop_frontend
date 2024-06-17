@@ -47,7 +47,7 @@ class PostRepository {
     } catch (e) {
       print(e);
     }
-    
+
     return '';
   }
 }
