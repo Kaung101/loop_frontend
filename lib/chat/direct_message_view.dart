@@ -48,7 +48,18 @@ class _DirectMessageViewState extends State<DirectMessageView> {
         ),
         title: const Align(
           alignment: Alignment.topLeft,
-          child: Text('User'),
+          child: Row(children: [
+            Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: CircleAvatar(
+                  backgroundColor: AppColors.primaryColor,
+                  child: Text(
+                    'U',
+                    style: TextStyle(color: AppColors.backgroundColor),
+                  ),
+                )),
+            Text('User')
+          ]),
         ),
       ),
       body: BlocBuilder<ChatBloc, ChatState>(builder: (context, state) {
