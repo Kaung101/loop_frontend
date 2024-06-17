@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:loop/chat/chat_view.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/components/nav.dart';
 import 'package:loop/post_management/create_post.dart';
@@ -18,6 +19,7 @@ class _BottomNavState extends State<BottomNav> {
 
   final List<Widget> screens = [
     const HomeScreen(),
+    const ChatView(),
     const CreatePost(), 
     const ProfileView(),
   ];
@@ -52,6 +54,11 @@ class _BottomNavState extends State<BottomNav> {
               selectedIcon: Icon(CupertinoIcons.house_alt_fill, color: AppColors.backgroundColor),
               label: "",
             ),
+            NavigationDestination(
+              icon: Icon(CupertinoIcons.chat_bubble, color: AppColors.primaryColor),
+              selectedIcon: Icon(CupertinoIcons.chat_bubble, color: AppColors.backgroundColor),
+              label: '',
+        ),
             NavigationDestination(
               icon: Icon(CupertinoIcons.add, color: AppColors.primaryColor, size: 30),
               selectedIcon: Icon(CupertinoIcons.add, color: AppColors.backgroundColor),

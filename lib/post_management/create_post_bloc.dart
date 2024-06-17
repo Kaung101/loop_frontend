@@ -15,7 +15,6 @@ class CreatePostBloc extends Bloc<CreatePostEvent, CreatePostState> {
     on<PostSubmitted>(_onSubmitted);
     on<BeforePhotoChanged>(_onBeforePhotoChanged);
     on<AfterPhotoChanged>(_onAfterPhotoChanged);
-    
   }
 
   void _onStatusChanged(PostStatusChanged event, Emitter<CreatePostState> emit) {

@@ -12,7 +12,7 @@ class CreatePostState {
   XFile? afterPhoto;
 
   CreatePostState({
-    this.status = false,
+    this.status = true,
     this.name = '',
     this.price = '',
     this.description = '',
