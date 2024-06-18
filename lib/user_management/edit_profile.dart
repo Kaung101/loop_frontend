@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
@@ -104,7 +105,7 @@ class _EditProfileState extends State<EditProfile> {
         backgroundColor: AppColors.backgroundColor,
         leading: ModalRoute.of(context)?.canPop == true
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(CupertinoIcons.left_chevron, color: AppColors.textColor),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -292,7 +293,7 @@ class _EditProfileState extends State<EditProfile> {
                 controller: _emailController,
                 enabled: false,
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 55),
               // Save Button
               Align(
                 child: Padding(

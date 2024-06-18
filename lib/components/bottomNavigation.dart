@@ -17,14 +17,25 @@ class BottomNav extends StatefulWidget {
 
 class _BottomNavState extends State<BottomNav> {
   int _selectedIndex = 0;
-
+    final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   final List<Widget> screens = [
     const HomeScreen(),
     const ChatView(),
     const CreatePost(), 
     const ProfileView(),
   ];
-
+    void _onItemTapped(int index) {
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      _navigatorKey.currentState?.pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => screens[index],
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return 
@@ -43,11 +54,7 @@ class _BottomNavState extends State<BottomNav> {
         ),
         child: NavigationBar(
           selectedIndex: _selectedIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
+          onDestinationSelected: _onItemTapped,
           surfaceTintColor: AppColors.primaryColor,
           indicatorColor: AppColors.primaryColor,
           backgroundColor: AppColors.backgroundColor,
@@ -75,13 +82,25 @@ class _BottomNavState extends State<BottomNav> {
           ],
         ),
       ),
-      body: SafeArea(
-        top: false,
-        child: IndexedStack(
-          index: _selectedIndex,
-          children: screens,
-        ),
-      ),
-    );
+      body: Navigator(
+        key: _navigatorKey,
+        onGenerateRoute: (RouteSettings settings) {
+          WidgetBuilder builder;
+          switch (settings.name) {
+            case '/':
+              builder = (BuildContext _) => screens[_selectedIndex];
+              break;
+            case '/editProfile':
+              builder = (BuildContext _) => const EditProfile();
+              break;
+            default:
+              builder = (BuildContext _) => const Scaffold(
+                    body: Center(child: Text('Page not found')),
+                  );
+          }
+          return MaterialPageRoute(builder: builder, settings: settings);
+        },
+
+    ));
   }
 }
