@@ -28,6 +28,8 @@ class _OtherProfileState extends State<OtherProfile> {
   Future<void> _fetchUserData() async {
     try {
       final userData = await _authRepository.fetchOtherProfileData(userId: widget.userId);
+            //final userData = await _authRepository.fetchUserData();
+
       setState(() {
         _username = userData?['username'];
         _profileImageUrl = userData?['profileImage'];
@@ -82,8 +84,10 @@ class _OtherProfileState extends State<OtherProfile> {
       children: [
         CircleAvatar(
           radius: 50,
-          backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
-              ? NetworkImage(_profileImageUrl!)
+         backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
+              ? NetworkImage(
+                'http://localhost:3000/media?media_id=$_profileImageUrl'
+              )
               : const AssetImage('image/logo.png') as ImageProvider,
         ),
         const SizedBox(width: 40),
@@ -198,15 +202,15 @@ class ShowOtherPost extends StatelessWidget {
   Future<List<dynamic>> getAllPost() async {
     final postList = await _authRepository.otherProfilePost(userId: userId);
     return postList.map((post) => PostWidget(
-      username: post['user_name'],
-      userId: post['user'],
-      userImage: (post['profileImage'] != null) ? post['user_img'] : 'image/logo.png', // Replace with actual data if available
+      username: post['user_name'] ?? '',
+      userId: post['user'] ?? '',
+      userImage: post['profileImage'] ?? '', // Replace with actual data if available
       postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
       postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
-      status: post['artist_post'] == false ? "Upcycled by me" : "Looking for artisit"  , // Replace with actual data if available
-      productName: post['name'],
-      productPrice: post['price'],
-      description: post['description'],
+      status: post['artist_post'] == false ?  "Looking for artisit" : "Upcycled by me"  , // Replace with actual data if available
+      productName: post['name']?? '',
+      productPrice: post['price']?? '',
+      description: post['description']?? '',
     )).toList();
   }
 
@@ -220,7 +224,7 @@ class ShowOtherPost extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No posts available'));
+          return const Center(child: Text('No Upcycled by  yet!'));
         } else {
           final posts = snapshot.data!;
           return ListView.builder(
@@ -285,9 +289,15 @@ class PostWidget extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(userImage),
+                     ClipOval(
+                      child: userImage != 'null' && userImage.isNotEmpty
+                        ? Image.network(
+                           'http://localhost:3000/media?media_id=$userImage',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          )
+                        :  Image.asset('image/logo.png', width: 60, height: 60),
                     ),
                     const SizedBox(width: 5),
                     TextButton(

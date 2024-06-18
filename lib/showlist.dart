@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/other_profile/other_profile.dart';
+import 'package:loop/user_management/user_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,16 +25,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<dynamic>> getAllPost() async {
     final postList = await authRepository.fetchAllPost();
+    print(postList);
     return postList.map((post) => PostWidget(
-      username: post['user_name'],
-      userId: post['user'],
-      userImage: (post['user_img'] != null )? post['user_img'] : 'image/logo.png', // Replace with actual data if available
-      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
-      status: post['artist_post'] == false ? "Upcycled by me" : "Looking for artisit"  , // Replace with actual data if available
-      productName: post['name'],
-      productPrice: post['price'],
-      description: post['description'],
+      username: post['user_name'] ?? '',
+      userId: post['user'] ?? '',
+      userImage: post['profileImage'] ?? '', // Replace with actual data if available
+      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo'] ?? ''}', // Replace with actual data if available
+      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo'] ?? ''}', // Replace with actual data if available
+      status: post['artist_post'] ? "Upcycled by me" : "Looking for artist", // Replace with actual data if available
+      productName: post['name'] ?? '',
+      productPrice: post['price'] ?? '',
+      description: post['description'] ?? '',
     )).toList();
   }
 
@@ -155,9 +157,15 @@ class PostWidget extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(userImage),
+                    ClipOval(
+                      child: userImage != 'null' && userImage.isNotEmpty
+                        ? Image.network(
+                           'http://localhost:3000/media?media_id=$userImage',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset('image/logo.png', width: 60, height: 60),
                     ),
                     const SizedBox(width: 5),
                     TextButton(
@@ -261,7 +269,6 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -365,11 +372,12 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              
             ],
           ),
         ),
       ),
     );
   }
-
 }

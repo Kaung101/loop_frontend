@@ -24,6 +24,7 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     _fetchUserData();
+    
   }
 
   Future<void> _fetchUserData() async {
@@ -31,7 +32,7 @@ class _ProfileViewState extends State<ProfileView> {
       final userData = await _authRepository.fetchUserData();
       setState(() {
         _username = userData?['user']['username'];
-        _profileImageUrl = userData?['user']['profile_imgUrl'];
+        _profileImageUrl = userData?['user']['profileImage'];
       });
     } catch (e) {
       print('Error fetching user data: $e');
@@ -88,7 +89,9 @@ class _ProfileViewState extends State<ProfileView> {
         CircleAvatar(
           radius: 50,
           backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
-              ? NetworkImage(_profileImageUrl!)
+              ? NetworkImage(
+                'http://localhost:3000/media?media_id=$_profileImageUrl'
+              )
               : const AssetImage('image/logo.png') as ImageProvider,
         ),
         const SizedBox(width: 40),
@@ -347,19 +350,31 @@ class _ProfileViewState extends State<ProfileView> {
 
 class ShowOwnerPost extends StatelessWidget {
   final AuthRepository _authRepository = AuthRepository();
+  late Future<List<dynamic>> _postFuture;
+
+  @override
+  void initState() {
+    _postFuture = getAllPost();
+    refreshPosts();
+  }
 
   Future<List<dynamic>> getAllPost() async {
     final postList = await _authRepository.fetchOwnerPost();
     return postList.map((post) => PostWidget(
-      username: post['user_name'],
-      userImage: (post['user_img'] != null) ? post['user_img'] : 'image/logo.png',
+      username: post['user_name'] ?? '',
+      userImage: post['profileImage'] ?? '',
       postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
       postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}',
-      status: post['artist_post'] == true ? 'Looking for artist' : 'Upcycled by Me',
-      productName: post['name'],
-      productPrice: post['price'],
-      description: post['description'],
+      status: post['artist_post'] == false ? 'Looking for artist' : 'Upcycled by Me',
+      productName: post['name'] ?? '',
+      productPrice: post['price'] ?? '',
+      description: post['description'] ?? '',
     )).toList();
+  }
+  void refreshPosts() {
+    //setState(() {
+      _postFuture = getAllPost();
+    //});
   }
 
   @override
@@ -441,10 +456,16 @@ class PostWidget extends StatelessWidget {
               Row(
                 children: [
                   const SizedBox(width: 8),
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundImage: NetworkImage(userImage),
-                  ),
+                  ClipOval(
+                      child: userImage != 'null' && userImage.isNotEmpty
+                        ? Image.network(
+                           'http://localhost:3000/media?media_id=$userImage',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          )
+                        :  Image.asset('image/logo.png', width: 60, height: 60),
+                    ),
                   const SizedBox(width: 4),
                   TextButton(
                   style: ButtonStyle(

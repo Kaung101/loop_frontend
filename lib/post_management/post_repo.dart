@@ -19,7 +19,6 @@ class PostRepository {
   }) async {
     final token = await storage.read(key: 'jwtToken');
     if (token == null) return 'User is not logged in!';
-    
     final String? beforeMime = lookupMimeType(beforePhoto.path);
     final String? afterMime = lookupMimeType(afterPhoto.path);
     final beforeMimeType = MediaType.parse(beforeMime!);
