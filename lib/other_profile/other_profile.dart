@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:loop/auth/auth_repo.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
-import 'package:loop/showlist.dart';
 
 class OtherProfile extends StatefulWidget {
+
   final String userId;
+  
+
   OtherProfile({super.key, required this.userId});
 
   @override
@@ -14,6 +18,7 @@ class OtherProfile extends StatefulWidget {
 }
 
 class _OtherProfileState extends State<OtherProfile> {
+   
   final AuthRepository _authRepository = AuthRepository();
 
   String? _username;
@@ -24,6 +29,7 @@ class _OtherProfileState extends State<OtherProfile> {
     super.initState();
     _fetchUserData();
   }
+
 
   Future<void> _fetchUserData() async {
     try {
@@ -38,6 +44,7 @@ class _OtherProfileState extends State<OtherProfile> {
       print('Error fetching user data: $e');
     }
   }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +57,12 @@ class _OtherProfileState extends State<OtherProfile> {
           alignment: Alignment.topLeft,
           child: Text(_username ?? 'Username'),
         ),
-        leading: IconButton(
-          icon: const Icon(
-            CupertinoIcons.left_chevron,
-            color: AppColors.textColor,
-          ),
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (Route<dynamic> route) => false,
-            );
-          },
-        ),
+        leading: ModalRoute.of(context)?.canPop == true
+            ? IconButton(
+                icon: const Icon(CupertinoIcons.left_chevron),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -71,10 +71,12 @@ class _OtherProfileState extends State<OtherProfile> {
             const SizedBox(height: 20),
             _buttonSection(),
             const SizedBox(height: 20),
-            ShowOtherPost(userId: userId),
+            ShowOtherPost(userId: userId, image: _profileImageUrl ?? ''),
           ],
         ),
       ),
+      
+      
     );
   }
 
@@ -195,16 +197,16 @@ class _OtherProfileState extends State<OtherProfile> {
 
 class ShowOtherPost extends StatelessWidget {
   final AuthRepository _authRepository = AuthRepository();
-  final String userId;
-
-  ShowOtherPost({required this.userId});
+  final String userId; 
+  final String image;
+  ShowOtherPost({super.key, required this.userId, required this.image});
 
   Future<List<dynamic>> getAllPost() async {
     final postList = await _authRepository.otherProfilePost(userId: userId);
     return postList.map((post) => PostWidget(
       username: post['user_name'] ?? '',
       userId: post['user'] ?? '',
-      userImage: post['profileImage'] ?? '', // Replace with actual data if available
+      userImage: post['profileImage'] ?? '' , // Replace with actual data if available
       postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
       postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
       status: post['artist_post'] == false ?  "Looking for artisit" : "Upcycled by me"  , // Replace with actual data if available
@@ -213,7 +215,7 @@ class ShowOtherPost extends StatelessWidget {
       description: post['description']?? '',
     )).toList();
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
@@ -282,9 +284,13 @@ class PostWidget extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
+              
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => OtherProfile(userId: userId)),
+                    MaterialPageRoute(
+                      builder: (context) => OtherProfile(userId: userId),
+                    ),
+
                   );
                 },
                 child: Row(

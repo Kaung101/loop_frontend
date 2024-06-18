@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:loop/chat/chat_view.dart';
 import 'package:loop/components/colors.dart';
+import 'package:loop/other_profile/other_profile.dart';
 import 'package:loop/post_management/create_post.dart';
 import 'package:loop/showlist.dart';
+import 'package:loop/user_management/edit_profile.dart';
 import 'package:loop/user_management/view_profile.dart';
 
 class BottomNav extends StatefulWidget {
@@ -25,7 +27,9 @@ class _BottomNavState extends State<BottomNav> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return 
+    Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: 0, bottom: 0),
         decoration: const BoxDecoration(

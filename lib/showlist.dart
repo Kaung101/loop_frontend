@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/other_profile/other_profile.dart';
-import 'package:loop/user_management/user_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<dynamic>> getAllPost() async {
     final postList = await authRepository.fetchAllPost();
-    print(postList);
     return postList.map((post) => PostWidget(
       username: post['user_name'] ?? '',
       userId: post['user'] ?? '',
@@ -153,7 +151,11 @@ class PostWidget extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfile(userId: userId)));
+                  Navigator.push(
+                    context, MaterialPageRoute(
+                      builder: (context) => OtherProfile(userId: userId),
+                  ));
+                  
                 },
                 child: Row(
                   children: [
@@ -271,10 +273,10 @@ class PostWidget extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children:  [
                         Text(
                           'Status: ',
                           style: TextStyle(

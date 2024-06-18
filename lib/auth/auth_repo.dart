@@ -109,7 +109,6 @@ Future<void> logoutUser(String token) async {
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
-        print(response.body);
           return jsonDecode(response.body);
         //return jsonDecode(response.body);
       }
@@ -139,7 +138,6 @@ Future<void> logoutUser(String token) async {
       headers: {'Content-Type': 'application/json'},
     );
     if(response.statusCode == 200){
-      print(response.body);
       return jsonDecode(response.body);
     }else{
       return [];
@@ -195,11 +193,9 @@ Future<void> logoutUser(String token) async {
         'lastName': lastName,
         'username': username,}),
     );
-    print(response.body);
-    if(response.body == 'true'){
-      
+    if(response.body != 'null'){
       return true;
-  }  
+    }
   return false;
   }
 
@@ -211,7 +207,6 @@ Future<void> logoutUser(String token) async {
     final String? imageMime = lookupMimeType(image.path);
     final imageMimeType = MediaType.parse(imageMime!);
 
-    print(imageStr);
     final response = await http.put(
       Uri.parse('$baseUrl/api/auth/editProfileImage'),
       headers: {'Content-Type': 'application/json'},

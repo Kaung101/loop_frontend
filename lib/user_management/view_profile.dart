@@ -4,6 +4,7 @@ import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
+import 'package:loop/components/editProfileNav.dart';
 import 'package:loop/user_management/edit_profile.dart';
 import 'package:loop/user_management/change_password.dart';
 
