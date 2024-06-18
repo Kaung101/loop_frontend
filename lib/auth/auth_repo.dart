@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:loop/other_profile/other_profile.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart' show MediaType;
 class AuthRepository {
   final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:3000');
   final storage = const  FlutterSecureStorage();
@@ -96,6 +100,7 @@ Future<void> logoutUser(String token) async {
   Future<String?> getAuthToken() async {
     return await storage.read(key: 'jwtToken');
   }
+  
   Future<Map<String, dynamic>?> fetchUserData() async {
     final authToken = await getAuthToken();
     if (authToken != null) {
@@ -104,6 +109,7 @@ Future<void> logoutUser(String token) async {
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
+        print(response.body);
           return jsonDecode(response.body);
         //return jsonDecode(response.body);
       }
@@ -153,7 +159,6 @@ Future<void> logoutUser(String token) async {
   }
   //get other profile post
   Future<List<dynamic>> otherProfilePost({required String userId}) async {
-    print("hello $userId");
     final response = await http.get(
       Uri.parse('$baseUrl/show/otherProfilePost/$userId'),
       headers: {'Content-Type': 'application/json'},
@@ -179,7 +184,8 @@ Future<void> logoutUser(String token) async {
   }
 
   //edit profile
-  Future<bool> editProfile({required String firstName, required String lastName, required String username, required String email}) async{
+  Future<bool> editProfile({required String firstName, required String lastName, required String username, required String email, 
+}) async{
     final response = await http.put(
       Uri.parse('$baseUrl/api/auth/editProfile'),
       headers: {'Content-Type': 'application/json'},
@@ -189,10 +195,38 @@ Future<void> logoutUser(String token) async {
         'lastName': lastName,
         'username': username,}),
     );
+    print(response.body);
     if(response.body == 'true'){
+      
       return true;
   }  
   return false;
   }
+
+  //edit proifle image with header barer token
+
+  Future<bool> editProfileImage({required XFile image, required String userId}) async{
+    final bytes = image.readAsBytes();
+    final imageStr = base64Encode(await bytes);
+    final String? imageMime = lookupMimeType(image.path);
+    final imageMimeType = MediaType.parse(imageMime!);
+
+    print(imageStr);
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/auth/editProfileImage'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': userId,
+        'image': imageStr,
+        'mimeType': imageMimeType.toString(),
+      }),
+    );
+    final res = response.body;
+    if(response.body != 'null'){
+      return true;
+    }
+    return false;
+  }
+
 
 }
