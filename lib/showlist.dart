@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
+import 'package:loop/searchBar/searchScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,7 +54,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     //   ),
                     // ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const searchScreen(),
+                                  settings: const RouteSettings(name: '/changePw'),
+                                ),
+                              );
+                  },
                   child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
                 ),
               ),

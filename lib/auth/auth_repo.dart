@@ -1,7 +1,14 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'package:http_parser/http_parser.dart';
+import 'dart:typed_data';
+
+import 'package:mime/mime.dart';
+
 class AuthRepository {
   final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:3000');
   final storage = const  FlutterSecureStorage();
@@ -167,4 +174,105 @@ Future<void> logoutUser(String token) async {
   return false;
   }
 
+  // Future<String?> uploadProfilePhoto(Uint8List imageBytes) async {
+  //   final uploadUrl = '$baseUrl/api/auth/me'; // Replace with your actual API endpoint
+  //   try {
+  //     final request = http.MultipartRequest('POST', Uri.parse(uploadUrl))
+  //       ..files.add(
+  //         http.MultipartFile.fromBytes(
+  //           'file',
+  //           imageBytes,
+  //           filename: 'profile_photo.png',
+  //           contentType: MediaType('image', 'png'),
+  //         ),
+  //       );
+
+  //     final response = await request.send();
+
+  //     if (response.statusCode == 200) {
+  //       final responseBody = await http.Response.fromStream(response);
+  //       final responseData = json.decode(responseBody.body);
+  //       return responseData['url'];
+  //     } else {
+  //       print('Failed to upload profile photo. Status code: ${response.statusCode}');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print('Upload error: $e');
+  //     return null;
+  //   }
+  // }
+Future<String?> uploadProfilePhoto( {required XFile profilePhoto}) async {
+    final token = await storage.read(key: 'jwtToken');
+    if(token == null) return "User is not loggined";
+    final String? photomime = lookupMimeType(profilePhoto.path);
+    final photomimeType = MediaType.parse(photomime!);
+    /* final formData = FormData.fromMap(
+      {
+        'profile_photo': await MultipartFile.fromFile(profilePhoto.path, contentType: photomimeType),
+      }
+    ); */
+    final dio = Dio();
+
+    try{
+          final bytes = await profilePhoto.readAsBytes();
+          String? base64Image = base64Encode(bytes);
+          print(base64Image);
+      final response = await dio.post(
+        Uri.parse('$baseUrl/api/auth/uploadProfilePhoto').toString(),
+        options: Options(
+          headers: {'Authorization' : "Bearer $token"},
+        ),
+        data: jsonEncode(
+          {
+            'profile_photo': base64Image,
+          }
+        ),
+      );
+    }
+    catch(e){
+      print(e);
+    }
+  }
+
+
+  /* Future<List<Map<String, dynamic>>> fetchUsers(String baseUrl, {String? searchQuery}) async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/api/auth/users'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      
+      // Filter users based on search query
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        data = data.where((user) => user['username'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      }
+      
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to fetch users');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
+  }
+} */
+
+Future<List<Map<String, dynamic>>> fetchUsers(String? searchQuery) async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/api/auth/users'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      
+      // Filter users based on search query
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        data = data.where((user) => user['username'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      }
+      
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to fetch users');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
+  }
+}
 }
