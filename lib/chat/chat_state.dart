@@ -8,6 +8,7 @@ class Message {
   String to = '';
   MessageType type = MessageType.text;
   String content = '';
+  String mimetype = '';
   DateTime? timestamp;
 
   Message({
@@ -16,6 +17,7 @@ class Message {
     required this.fromUser,
     required this.content,
     required this.type,
+    required this.mimetype,
     DateTime? timestamp,
   });
 
@@ -25,6 +27,7 @@ class Message {
     'from_user': fromUser,
     'content': content,
     'type': type.name,
+    'mimetype': mimetype,
   };
 }
 
