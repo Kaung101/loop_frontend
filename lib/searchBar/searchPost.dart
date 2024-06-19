@@ -22,7 +22,7 @@ class _SearchPostState extends State<SearchPost> {
     try {
       return postCardList.map((card) => {
         'username': card['user_name'] ?? '', 
-        'userImage': card['userImage'] ?? '',
+        'userImage': card['profileImage'] ?? '',
         'postImageOne': 'http://localhost:3000/media?media_id=${card['original_photo'] ?? ''}', 
         'postImageTwo': 'http://localhost:3000/media?media_id=${card['reference_photo'] ?? ''}',        
         'status': card['artist_post'] ? "Upcycled by me" : "Looking for artist",
@@ -61,7 +61,7 @@ class _SearchPostState extends State<SearchPost> {
               ); */
               return PostWidget(
                 username: snapshot.data![index]['username'] ?? '', 
-                userImage: snapshot.data![index]['profileImage'] ?? '', 
+                userImage: snapshot.data![index]['userImage'] ?? '', 
                 postImageOne: snapshot.data![index] ['postImageOne'] ?? '', 
                 postImageTwo: snapshot.data![index]['postImageTwo'] ?? '', 
                 status: snapshot.data![index]['status'] ?? '', 

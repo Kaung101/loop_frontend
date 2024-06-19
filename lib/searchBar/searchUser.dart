@@ -43,8 +43,8 @@ class _searchUserState extends State<searchUser> {
     final searchCardList = await authRepository.fetchUsers(searchQuery);
     try {
       return searchCardList.map((card) => {
-        'username': card['username'], 
-        'userImage': card['userImage']
+        'username': card['username'] ?? '', 
+        'userImage': card['profileImage'] ?? ''
       }).toList();
     } catch (e) {
       print('Error fetching users: $e');
