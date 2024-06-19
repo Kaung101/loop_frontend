@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/searchBar/searchScreen.dart';
+import 'package:loop/other_profile/other_profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,27 +14,40 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final AuthRepository authRepository = AuthRepository();
-  
-  //get all post future method and return post data
+  late Future<List<dynamic>> _postFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _postFuture = getAllPost();
+    refreshPosts();
+  }
+
   Future<List<dynamic>> getAllPost() async {
     final postList = await authRepository.fetchAllPost();
     return postList.map((post) => PostWidget(
-      username: post['user_name'],
-      userImage: (post['user_img'] != null )? post['user_img'] : 'image/logo.png', // Replace with actual data if available
-      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}', // Replace with actual data if available
-      status: 'Looking for artist', // Replace with actual data if available
-      productName: post['name'],
-      productPrice: post['price'],
-      description: post['description'],
+      username: post['user_name'] ?? '',
+      userId: post['user'] ?? '',
+      userImage: post['profileImage'] ?? '', // Replace with actual data if available
+      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo'] ?? ''}', // Replace with actual data if available
+      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo'] ?? ''}', // Replace with actual data if available
+      status: post['artist_post'] ? "Upcycled by me" : "Looking for artist", // Replace with actual data if available
+      productName: post['name'] ?? '',
+      productPrice: post['price'] ?? '',
+      description: post['description'] ?? '',
     )).toList();
   }
 
-  //get 
+  void refreshPosts() {
+    setState(() {
+      _postFuture = getAllPost();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.backgroundColor,
@@ -48,11 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
                     elevation: MaterialStateProperty.all(0),
-                    // shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    //   RoundedRectangleBorder(
-                    //     borderRadius: BorderRadius.circular(10.0),
-                    //   ),
-                    // ),
                   ),
                   onPressed: () {
 
@@ -88,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: FutureBuilder<List<dynamic>>(
-        future: getAllPost(),
+        future: _postFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -109,9 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
 class PostWidget extends StatelessWidget {
-  //final String postId;
-  //final String userId;
+  final String userId;
   final String username;
   final String userImage;
   final String postImageOne;
@@ -122,9 +131,8 @@ class PostWidget extends StatelessWidget {
   final String description;
 
   const PostWidget({
-    super.key, 
-    //required this.postId,
-   // required this.userId,
+    super.key,
+    required this.userId,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -140,86 +148,144 @@ class PostWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
+        color: AppColors.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
-          side: const BorderSide(color: AppColors.textColor, width: 1.0), // Set border color and width
+          side: const BorderSide(color: AppColors.textColor, width: 1.0),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(userImage),
-                  ),
-                  const SizedBox(width: 5),
-                  TextButton(
-                  style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.transparent;
-                      }
-                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
-                        return Colors.transparent;
-                      }
-                      return null; // Defer to the widget's default.
-                    },
-                  ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context, MaterialPageRoute(
+                      builder: (context) => OtherProfile(userId: userId),
+                  ));
+                  
+                },
+                child: Row(
+                  children: [
+                    ClipOval(
+                      child: userImage != 'null' && userImage.isNotEmpty
+                        ? Image.network(
+                           'http://localhost:3000/media?media_id=$userImage',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset('image/logo.png', width: 60, height: 60),
+                    ),
+                    const SizedBox(width: 5),
+                    TextButton(
+                      style: ButtonStyle(
+                        overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                          (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.transparent;
+                            }
+                            if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                              return Colors.transparent;
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => OtherProfile(userId: userId)));
+                      },
+                      child: Text(
+                        username,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300, color: AppColors.textColor),
+                      ),
+                    ),
+                  ],
                 ),
-                    onPressed: (){
-
-                    },
-                     child: Text(
-                    username,
-                    style:const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.textColor
-                    ),
-                  ),
-                    )
-
-                ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      children: [
-                        Image.network(
-                          postImageOne,
-                          height: 100,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        Text('Original Product'),
-                      ],
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                              ),
+                              child: Image.network(
+                                postImageOne,
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            const Text(
+                              'Original Product',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
-                    child: Column(
-                      children: [
-                        Image.network(
-                          postImageTwo,
-                          height: 100,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        Text('Reference'),
-                      ],
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                              ),
+                              child: Image.network(
+                                postImageTwo,
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            const Text(
+                              'Reference',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children:  [
                         Text(
                           'Status: ',
                           style: TextStyle(
@@ -239,13 +305,13 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Text(
                           'Product Name: ',
                           style: TextStyle(
@@ -265,13 +331,13 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Text(
                           'Price: ',
                           style: TextStyle(
@@ -291,13 +357,13 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Text(
                           'Description: ',
                           style: TextStyle(
@@ -311,14 +377,14 @@ class PostWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '• $description',
-                        ),
+                        Text('• $description'),
                       ],
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              
             ],
           ),
         ),

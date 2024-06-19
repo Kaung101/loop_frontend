@@ -1,12 +1,11 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:loop/auth/auth_repo.dart';
-import 'package:loop/user_management/view_profile.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -23,9 +22,8 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _usernameController = TextEditingController();
 
   String _profilePhotoUrl = '';
-  XFile? profilePhoto;
   final AuthRepository _authRepository = AuthRepository();
-
+  String? userId;
   @override
   void initState() {
     super.initState();
@@ -36,8 +34,9 @@ class _EditProfileState extends State<EditProfile> {
     try {
       final userData = await _authRepository.fetchUserData();
       setState(() {
+        userId = userData?['user']['_id'];
         _usernameController.text = userData?['user']['username'] ?? '';
-        _profilePhotoUrl = userData?['user']['profile_imgUrl'] ?? '';
+        _profilePhotoUrl = userData?['user']['profileImage'] ?? '';
         _emailController.text = userData?['user']['email'] ?? '';
         _firstNameController.text = userData?['user']['firstName'] ?? '';
         _lastNameController.text = userData?['user']['lastName'] ?? '';
@@ -49,7 +48,7 @@ class _EditProfileState extends State<EditProfile> {
 
   void _updateUserProfile() async {
     try {
-      await _authRepository.editProfile(
+      final res = await _authRepository.editProfile(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         username: _usernameController.text,
@@ -57,12 +56,11 @@ class _EditProfileState extends State<EditProfile> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully!')),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfileView()),
+        const SnackBar(
+          content: Text('Profile updated successfully!',
+              style: TextStyle(color: AppColors.backgroundColor)),
+          backgroundColor: AppColors.tertiaryColor,
+        ),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -78,27 +76,23 @@ class _EditProfileState extends State<EditProfile> {
     final ImagePicker imagePicker = ImagePicker();
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      //add pickfile to profile photo
-      profilePhoto = pickedFile;
       final bytes = await pickedFile.readAsBytes();
       setState(() {
-        //add pickfile to profile photot
-        //profilePhoto = pickedFile;
-       _profileImageBytes = bytes;
-       // print('$profilePhoto from pick pick');
+        _profileImageBytes = bytes;
       });
-      // Use the new upload logic
-      final uploadedUrl = await _authRepository.uploadProfilePhoto(profilePhoto: pickedFile );
-      if (uploadedUrl != null) {
+      // Implement upload image logic
+      var res = await _authRepository.editProfileImage(
+          image: pickedFile, userId: userId!);
+      if (res) {
         setState(() {
-          print(profilePhoto);
+          _fetchUserData();
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile photo uploaded successfully!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to upload profile photo.')),
+          const SnackBar(
+            content: Text('Profile Image updated successfully!',
+                style: TextStyle(color: AppColors.backgroundColor)),
+            backgroundColor: AppColors.tertiaryColor,
+          ),
         );
       }
     }
@@ -111,7 +105,7 @@ class _EditProfileState extends State<EditProfile> {
         backgroundColor: AppColors.backgroundColor,
         leading: ModalRoute.of(context)?.canPop == true
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(CupertinoIcons.left_chevron, color: AppColors.textColor),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -144,12 +138,13 @@ class _EditProfileState extends State<EditProfile> {
                             )
                           : (_profilePhotoUrl.isNotEmpty
                               ? Image.network(
-                                  _profilePhotoUrl,
+                                  'http://localhost:3000/media?media_id=$_profilePhotoUrl',
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     print("Error loading image: $error");
                                     return Image.asset(
                                       'image/logo.png',
+                                      
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
@@ -157,7 +152,8 @@ class _EditProfileState extends State<EditProfile> {
                                   },
                                 )
                               : Image.asset(
-                                  'image/logo.png',
+                                 'image/logo.png',
+                                  
                                   width: 200,
                                   height: 200,
                                 )),
@@ -173,7 +169,8 @@ class _EditProfileState extends State<EditProfile> {
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(50),
-                              side: const BorderSide(color: AppColors.textColor),
+                              side:
+                                  const BorderSide(color: AppColors.textColor),
                             ),
                             backgroundColor: AppColors.backgroundColor,
                           ),
@@ -189,7 +186,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+              //Text(_profilePhotoUrl),
               // First/Last Name
               Row(
                 children: [
@@ -256,9 +253,39 @@ class _EditProfileState extends State<EditProfile> {
                 ],
               ),
               // Username
-              TextFieldWithTitle(
-                title: 'Username',
-                controller: _usernameController,
+              Row(
+                children: [
+                  Flexible(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Username',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.textColor,
+                            ),
+                          ),
+                          TextField(
+                            controller: _usernameController,
+                            decoration: InputDecoration(
+                              filled: false,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: const BorderSide(
+                                  color: AppColors.textColor,
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               // Email
               TextFieldWithTitle(
@@ -266,7 +293,7 @@ class _EditProfileState extends State<EditProfile> {
                 controller: _emailController,
                 enabled: false,
               ),
-              const SizedBox(height: 88),
+              const SizedBox(height: 55),
               // Save Button
               Align(
                 child: Padding(
@@ -339,7 +366,7 @@ class TextFieldWithTitle extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 borderSide: const BorderSide(
                   color: AppColors.textColor,
-                  width: 0.8, // Bolder border width
+                  width: 3.0, // Bolder border width
                 ),
               ),
               focusedBorder: OutlineInputBorder(

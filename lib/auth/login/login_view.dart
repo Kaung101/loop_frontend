@@ -10,6 +10,8 @@ import 'package:loop/auth/login/login_event.dart';
 import 'package:loop/auth/login/login_state.dart';
 import 'package:loop/auth/signup/signup_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
+import 'package:loop/chat/chat_bloc.dart';
+import 'package:loop/chat/chat_event.dart';
 import '../../components/colors.dart';
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -229,7 +231,8 @@ class _LoginViewState extends State<LoginView> {
                       backgroundColor: AppColors.tertiaryColor,
                       textColor: AppColors.backgroundColor,
                       fontSize: 16.0);
-                        Future.delayed(const Duration(seconds: 1),(){
+                      context.read<ChatBloc>().add(UserLoggedIn());
+                      Future.delayed(const Duration(seconds: 1),(){
                     Navigator.push(
                       context,
                       MaterialPageRoute(

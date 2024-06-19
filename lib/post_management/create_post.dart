@@ -11,6 +11,7 @@ import 'package:loop/post_management/create_post_bloc.dart';
 import 'package:loop/post_management/create_post_event.dart';
 import 'package:loop/post_management/create_post_state.dart';
 import 'package:loop/post_management/post_repo.dart';
+import 'package:loop/showlist.dart';
 import 'package:mime/mime.dart';
 
 class CreatePost extends StatefulWidget {
