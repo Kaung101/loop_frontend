@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
-import 'package:loop/searchBar/searchList.dart';
+import 'package:loop/searchBar/searchPost.dart';
+import 'package:loop/searchBar/searchUser.dart';
 
 class searchScreen extends StatefulWidget {
   const searchScreen({super.key});
@@ -158,13 +159,13 @@ class _searchScreenState extends State<searchScreen> {
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
                           
-                          searchList(
+                          /* searchList(
+                            searchQuery: searchQuery,
+                          ), */
+                          searchUser(
                             searchQuery: searchQuery,
                           ),
-                          searchList(
-                            searchQuery: searchQuery,
-                          ),
-                          searchList(
+                          SearchPost(
                             searchQuery: searchQuery,
                           ),
                         ],

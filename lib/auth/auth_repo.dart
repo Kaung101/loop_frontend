@@ -275,4 +275,27 @@ Future<List<Map<String, dynamic>>> fetchUsers(String? searchQuery) async {
     throw Exception('Error: $e');
   }
 }
+
+Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/show/allPost'));
+     
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        // Filter posts based on search query
+        if (searchQuery != null && searchQuery.isNotEmpty) {
+          data = data.where((post) => post['name'].toLowerCase().contains(searchQuery.toLowerCase()) ||
+                                      post['description'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+        }
+        
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Failed to fetch posts');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
 }
