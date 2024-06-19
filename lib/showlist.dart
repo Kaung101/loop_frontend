@@ -4,6 +4,7 @@ import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/components/editProfileNav.dart';
+import 'package:loop/searchBar/searchScreen.dart';
 import 'package:loop/other_profile/other_profile.dart';
 import 'package:loop/user_management/edit_profile.dart';
 import 'package:loop/user_management/view_profile.dart';
@@ -463,7 +464,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
                     elevation: MaterialStateProperty.all(0),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const searchScreen(),
+                                  settings: const RouteSettings(name: '/changePw'),
+                                ),
+                              );
+                  },
                   child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
                 ),
               ),
