@@ -154,6 +154,8 @@ Future<void> logoutUser(String token) async {
     }else{
       return [];
     }
+
+
   }
   //get other profile post
   Future<List<dynamic>> otherProfilePost({required String userId}) async {
@@ -221,6 +223,21 @@ Future<void> logoutUser(String token) async {
       return true;
     }
     return false;
+  }
+
+
+ //new condition of own profile all post
+ //get other profile post
+  Future<List<dynamic>> ownProfilePost({required String userId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/owner/ownerProfilePost/$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if(response.statusCode == 200){
+      return jsonDecode(response.body);
+    }else{
+      return [];
+    }
   }
 
 

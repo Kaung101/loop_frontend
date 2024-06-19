@@ -20,6 +20,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   String? _username;
   String? _profileImageUrl;
+  String? userId;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _ProfileViewState extends State<ProfileView> {
       setState(() {
         _username = userData?['user']['username'];
         _profileImageUrl = userData?['user']['profileImage'];
+        userId = userData?['user']['_id'];
       });
     } catch (e) {
       print('Error fetching user data: $e');
@@ -349,18 +351,30 @@ class _ProfileViewState extends State<ProfileView> {
   }
 }
 
-class ShowOwnerPost extends StatelessWidget {
+class ShowOwnerPost extends StatefulWidget {
+  @override
+  _ShowOwnerPostState createState() => _ShowOwnerPostState();
+}
+
+class _ShowOwnerPostState extends State<ShowOwnerPost> {
   final AuthRepository _authRepository = AuthRepository();
   late Future<List<dynamic>> _postFuture;
+  late String userId;
 
   @override
   void initState() {
+    super.initState();
     _postFuture = getAllPost();
+    _authRepository.fetchUserData().then((userData) {
+      setState(() {
+        userId = userData?['user']['_id'];
+      });
+    });
     refreshPosts();
   }
 
   Future<List<dynamic>> getAllPost() async {
-    final postList = await _authRepository.fetchOwnerPost();
+    final postList = await _authRepository.ownProfilePost(userId: userId);
     return postList.map((post) => PostWidget(
       username: post['user_name'] ?? '',
       userImage: post['profileImage'] ?? '',
@@ -503,35 +517,84 @@ class PostWidget extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Image.network(
-                            postImageOne,
-                            height: 100,
-                          ),
-                          Text('Original Product'),
-                        ],
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                              ),
+                              child: Image.network(
+                                postImageOne,
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                             Text(
+                              (status) == 'Looking for artist'
+                                  ? 'Original Product'
+                                  : 'Before',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    SizedBox(width: 0),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Image.network(
-                            postImageTwo,
-                            height: 100,
-                          ),
-                          Text('Reference'),
-                        ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                              ),
+                              child: Image.network(
+                                postImageTwo,
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                             Text(
+                              (status) == 'Looking for artist'
+                                  ? 'Reference'
+                                  : 'After',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               SizedBox(height: 16),
               Row(
