@@ -288,7 +288,7 @@ Future<String?> uploadProfilePhoto( {required XFile profilePhoto}) async {
     try{
           final bytes = await profilePhoto.readAsBytes();
           String? base64Image = base64Encode(bytes);
-          print(base64Image);
+          //print(base64Image);
       final response = await dio.post(
         Uri.parse('$baseUrl/api/auth/uploadProfilePhoto').toString(),
         options: Options(

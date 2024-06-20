@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
@@ -28,7 +29,6 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
     _fetchUserData();
-    
   }
 
   Future<void> _fetchUserData() async {
@@ -51,9 +51,12 @@ class _ProfileViewState extends State<ProfileView> {
     try {
       await _authRepository.logoutUser(token!);
       if (mounted) {
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context, rootNavigator: true).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const LoginView(),
+            builder: (context) => RepositoryProvider(
+              create: (context) => AuthRepository(),
+              child: const LoginView(),
+            ),
           ),
         );
       }
@@ -82,8 +85,8 @@ class _ProfileViewState extends State<ProfileView> {
             const SizedBox(height: 20),
             _editProfileSection(),
             const SizedBox(height: 20),
-             ShowOwnerPost(),
-             //dropDown()
+            ShowOwnerPost(),
+            //dropDown()
             //),
           ],
         ),
@@ -99,13 +102,13 @@ class _ProfileViewState extends State<ProfileView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left:30.0),
+              padding: const EdgeInsets.only(left: 30.0),
               child: CircleAvatar(
                 radius: 75,
-                backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
+                backgroundImage: _profileImageUrl != null &&
+                        _profileImageUrl!.isNotEmpty
                     ? NetworkImage(
-                      'http://localhost:3000/media?media_id=$_profileImageUrl'
-                    )
+                        'http://localhost:3000/media?media_id=$_profileImageUrl')
                     : const AssetImage('image/logo.png') as ImageProvider,
               ),
             ),
@@ -115,22 +118,23 @@ class _ProfileViewState extends State<ProfileView> {
       ],
     );
   }
-  Widget _nameSection(){
-    return  Row(
+
+  Widget _nameSection() {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           _firstName ?? 'First Name',
-          style: const  TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: AppColors.textColor,
           ),
         ),
-         const SizedBox(width: 10),
-          Text(
-            _lastName ?? 'Last Name',
-          style: const  TextStyle(
+        const SizedBox(width: 10),
+        Text(
+          _lastName ?? 'Last Name',
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: AppColors.textColor,
@@ -139,6 +143,7 @@ class _ProfileViewState extends State<ProfileView> {
       ],
     );
   }
+
   void _showDeleteAccountDialog() {
     showDialog(
       context: context,
@@ -249,24 +254,25 @@ class _ProfileViewState extends State<ProfileView> {
                       ],
                     ),
                   ), */
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const EditProfile(),
-                                  settings: const RouteSettings(name: '/editProfile'),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfile(),
+                                settings:
+                                    const RouteSettings(name: '/editProfile'),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
               const Divider(color: AppColors.primaryColor),
@@ -282,13 +288,14 @@ class _ProfileViewState extends State<ProfileView> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.chevron_right),
-                          onPressed: (){
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const ChangePw(),
-                                  settings: const RouteSettings(name: '/changePw'),
-                                ),
-                              );
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const ChangePw(),
+                                settings:
+                                    const RouteSettings(name: '/changePw'),
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -368,21 +375,28 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
 
   Future<List<dynamic>> getAllPost() async {
     final postList = await _authRepository.ownProfilePost(userId: userId);
-    return postList.map((post) => PostWidget(
-      postId: post['_id'] ?? '',
-      username: post['user_name'] ?? '',
-      userImage: post['profileImage'] ?? '',
-      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}',
-      status: post['artist_post'] == false ? 'Looking for artist' : 'Upcycled by Me',
-      productName: post['name'] ?? '',
-      productPrice: post['price'] ?? '',
-      description: post['description'] ?? '',
-    )).toList();
+    return postList
+        .map((post) => PostWidget(
+              postId: post['_id'] ?? '',
+              username: post['user_name'] ?? '',
+              userImage: post['profileImage'] ?? '',
+              postImageOne:
+                  'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+              postImageTwo:
+                  'http://localhost:3000/media?media_id=${post['reference_photo']}',
+              status: post['artist_post'] == false
+                  ? 'Looking for artist'
+                  : 'Upcycled by Me',
+              productName: post['name'] ?? '',
+              productPrice: post['price'] ?? '',
+              description: post['description'] ?? '',
+            ))
+        .toList();
   }
+
   void refreshPosts() {
     //setState(() {
-      _postFuture = getAllPost();
+    _postFuture = getAllPost();
     //});
   }
 
@@ -399,7 +413,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
           return const Center(child: Text('No posts available'));
         } else {
           final posts = snapshot.data!;
-           return ListView.builder(
+          return ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: posts.length,
@@ -413,7 +427,6 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
   }
 }
 
-
 class PostWidget extends StatelessWidget {
   final String postId;
   //final String userId;
@@ -426,10 +439,10 @@ class PostWidget extends StatelessWidget {
   final String productPrice;
   final String description;
 
-   const PostWidget({
-    super.key, 
+  const PostWidget({
+    super.key,
     required this.postId,
-   // required this.userId,
+    // required this.userId,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -455,7 +468,9 @@ class PostWidget extends StatelessWidget {
         color: AppColors.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
-          side: const BorderSide(color: AppColors.textColor, width: 1.0), // Set border color and width
+          side: const BorderSide(
+              color: AppColors.textColor,
+              width: 1.0), // Set border color and width
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -466,48 +481,46 @@ class PostWidget extends StatelessWidget {
                 children: [
                   const SizedBox(width: 8),
                   ClipOval(
-                      child: userImage != 'null' && userImage.isNotEmpty
+                    child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                           'http://localhost:3000/media?media_id=$userImage',
+                            'http://localhost:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
                           )
-                        :  Image.asset('image/logo.png', width: 60, height: 60),
-                    ),
+                        : Image.asset('image/logo.png', width: 60, height: 60),
+                  ),
                   const SizedBox(width: 4),
                   TextButton(
-                  style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.transparent;
-                      }
-                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
-                        return Colors.transparent;
-                      }
-                      return null; // Defer to the widget's default.
-                    },
-                  ),
-                ),
-                    onPressed: (){
-
-                    },
-                     child: Text(
-                    username,
-                    style:const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textColor
+                    style: ButtonStyle(
+                      overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.hovered)) {
+                            return Colors.transparent;
+                          }
+                          if (states.contains(MaterialState.focused) ||
+                              states.contains(MaterialState.pressed)) {
+                            return Colors.transparent;
+                          }
+                          return null; // Defer to the widget's default.
+                        },
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      username,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor),
                     ),
                   ),
-                    ),
-                    const Spacer(),
-                    DropDown(postId : postId),
-                    IconButton(
-                          icon: const Icon(CupertinoIcons.delete),
-                          onPressed: (){},
-                        ),            
+                  const Spacer(),
+                  DropDown(postId: postId),
+                  IconButton(
+                    icon: const Icon(CupertinoIcons.delete),
+                    onPressed: () {},
+                  ),
                 ],
               ),
               SizedBox(height: 8),
@@ -537,7 +550,7 @@ class PostWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                             Text(
+                            Text(
                               (status) == 'Looking for artist'
                                   ? 'Original Product'
                                   : 'Before',
@@ -575,7 +588,7 @@ class PostWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                             Text(
+                            Text(
                               (status) == 'Looking for artist'
                                   ? 'Reference'
                                   : 'After',
@@ -720,15 +733,13 @@ class DropDownState extends State<DropDown> {
   ];
   bool status = true;
   //post status update
-  Future<void> updatePostShowHide() async{
-    try{
+  Future<void> updatePostShowHide() async {
+    try {
       final response = await AuthRepository().show_postStatus(
         postId: widget.postId,
         status: dropdownValue == 'Show Post' ? true : false,
       );
-     
-    }
-    catch(e){
+    } catch (e) {
       print('Error updating post status: $e');
     }
   }
@@ -741,7 +752,7 @@ class DropDownState extends State<DropDown> {
       decoration: BoxDecoration(
         //filled: false,
         //color: AppColors.backgroundColor,
-        border: Border.all(color: AppColors.textColor, width: 1.0),      
+        border: Border.all(color: AppColors.textColor, width: 1.0),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Center(
@@ -760,8 +771,6 @@ class DropDownState extends State<DropDown> {
           onChanged: (String? newValue) {
             setState(() {
               dropdownValue = newValue!;
-              print(dropdownValue);
-              print(widget.postId);
               updatePostShowHide();
             });
           },

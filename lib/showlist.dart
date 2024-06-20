@@ -418,8 +418,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         ownUserId = userData?['user']['_id'];
       });
-      print(ownUserId);
-      print('object');
     });
   }
 
@@ -569,8 +567,8 @@ class PostWidget extends StatelessWidget {
                       builder: (context) => ownUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
                       settings: ownUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
                   ));
-                  print("User ID from post widget: $userId");
-                  print("Own User ID from post widget: $ownUserId");
+                 // print("User ID from post widget: $userId");
+                  //print("Own User ID from post widget: $ownUserId");
                 },
                 child: Row(
                   children: [
