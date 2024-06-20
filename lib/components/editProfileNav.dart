@@ -32,7 +32,9 @@ class _ProfileNavState extends State<ProfileNav> {
             if(settings.name == '/editProfile') {
               return const EditProfile();
             }
-           
+            if(settings.name == '/viewProfile') {
+              return const ProfileView();
+            }
             //main page of the profile section
             return const ProfileView();
             

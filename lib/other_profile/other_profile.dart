@@ -23,6 +23,8 @@ class _OtherProfileState extends State<OtherProfile> {
 
   String? _username;
   String? _profileImageUrl;
+  String? _firstName;
+  String? _lastName;
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _OtherProfileState extends State<OtherProfile> {
       setState(() {
         _username = userData?['username'];
         _profileImageUrl = userData?['profileImage'];
+        _firstName = userData?['firstName'];
+        _lastName = userData?['lastName'];
       });
     } catch (e) {
       print('Error fetching user data: $e');
@@ -63,14 +67,25 @@ class _OtherProfileState extends State<OtherProfile> {
                 onPressed: () => Navigator.pop(context),
               )
             : null,
+            //chat here!
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: IconButton(
+              icon: const Icon(CupertinoIcons.chat_bubble_fill, color: AppColors.primaryColor, size: 30),
+              onPressed: () {},
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 10),
             _followerSection(),
             const SizedBox(height: 20),
-            _buttonSection(),
-            const SizedBox(height: 20),
+            _nameSection(),
+           // const SizedBox(height: 20),
             ShowOtherPost(userId: userId, image: _profileImageUrl ?? ''),
           ],
         ),
@@ -84,63 +99,53 @@ class _OtherProfileState extends State<OtherProfile> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 50,
-         backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
-              ? NetworkImage(
-                'http://localhost:3000/media?media_id=$_profileImageUrl'
-              )
-              : const AssetImage('image/logo.png') as ImageProvider,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 30.0),
+              child: CircleAvatar(
+                radius: 75,
+               backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
+                    ? NetworkImage(
+                      'http://localhost:3000/media?media_id=$_profileImageUrl'
+                    )
+                    : const AssetImage('image/logo.png') as ImageProvider,
+              ),
+            ),
+          ],
         ),
         const SizedBox(width: 40),
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '123',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              'followers',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
+        
+      ],
+    );
+    
+  }
+  //show firstname and last name
+  Widget _nameSection(){
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          _firstName ?? 'First Name',
+          style: const  TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
         ),
-        const VerticalDivider(
-          color: Colors.black,
-          thickness: 1,
-          width: 20,
-        ),
-        const SizedBox(width: 60),
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '321',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              'following',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
+         const SizedBox(width: 10),
+          Text(
+            _lastName ?? 'Last Name',
+          style: const  TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
         ),
       ],
     );
   }
-
   Widget _buttonSection() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

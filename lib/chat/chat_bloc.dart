@@ -26,6 +26,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     on<UserLoggedIn>(_onUserLoggedIn);
     on<SendMessage>(_onSendMessage);
+    on<SendMediaMessage>(_onSendMediaMessage);
     on<ReceiveMessage>(_onReceiveMessage);
   }
 
@@ -44,19 +45,24 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<void> _onReceiveMessage(
       ReceiveMessage event, Emitter<ChatState> emit) async {
-    Map<Tuple2<String, String>, List<Message>> originalMessages = Map.from(state.messages);
+    Map<Tuple2<String, String>, List<Message>> originalMessages =
+        Map.from(state.messages);
     final key = Tuple2<String, String>(event.from, event.fromUser);
     if (!originalMessages.containsKey(key)) {
       List<Message> emptyList = [];
-      originalMessages.addEntries([MapEntry(Tuple2.fromList([event.from, event.fromUser]), emptyList)]);
+      originalMessages.addEntries([
+        MapEntry(Tuple2.fromList([event.from, event.fromUser]), emptyList)
+      ]);
     }
 
-    final messagesOfUser = originalMessages[Tuple2.fromList([event.from, event.fromUser])];
+    final messagesOfUser =
+        originalMessages[Tuple2.fromList([event.from, event.fromUser])];
     final messageToAdd = Message(
         to: await getUserId(),
         from: event.from,
         fromUser: event.fromUser,
         content: event.content,
+        mimetype: '',
         type: MessageType.text);
 
     messagesOfUser!.add(messageToAdd);
@@ -75,7 +81,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<void> _onSendMessage(
       SendMessage event, Emitter<ChatState> emit) async {
-    Map<Tuple2<String, String>, List<Message>> originalMessages = Map.from(state.messages);
+    Map<Tuple2<String, String>, List<Message>> originalMessages =
+        Map.from(state.messages);
 
     final key = Tuple2<String, String>(event.to, event.toUser);
     if (!originalMessages.containsKey(key)) {
@@ -85,10 +92,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     final messagesOfUser = originalMessages[key];
     final messageToAdd = Message(
-        from: '',                             // server will read jwt token and add the info
-        fromUser: '',                         // server will read jwt token and add the info
+        from: '', // server will read jwt token and add the info
+        fromUser: '', // server will read jwt token and add the info
         to: event.to,
         content: event.content,
+        mimetype: '',
         type: MessageType.text);
 
     messagesOfUser!.add(messageToAdd);
@@ -98,5 +106,34 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ));
 
     socket.emit('send:message', jsonEncode(messageToAdd));
+  }
+
+  Future<void> _onSendMediaMessage(
+      SendMediaMessage event, Emitter<ChatState> emit) async {
+    Map<Tuple2<String, String>, List<Message>> originalMessages =
+        Map.from(state.messages);
+
+    final key = Tuple2<String, String>(event.to, event.toUser);
+    if (!originalMessages.containsKey(key)) {
+      List<Message> emptyList = [];
+      originalMessages.addEntries([MapEntry(key, emptyList)]);
+    }
+
+    final messagesOfUser = originalMessages[key];
+    final messageToAdd = Message(
+        from: '', // server will read jwt token and add the info
+        fromUser: '', // server will read jwt token and add the info
+        to: event.to,
+        content: event.content,
+        mimetype: event.mimetype,
+        type: MessageType.media);
+
+    messagesOfUser!.add(messageToAdd);
+
+    emit(state.copyWith(
+      messages: originalMessages,
+    ));
+
+    socket.emit('send:media_message', json.encode(messageToAdd));
   }
 }

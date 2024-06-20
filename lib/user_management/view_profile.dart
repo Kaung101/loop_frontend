@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
@@ -20,12 +21,14 @@ class _ProfileViewState extends State<ProfileView> {
 
   String? _username;
   String? _profileImageUrl;
+  String? userId;
+  String? _firstName;
+  String? _lastName;
 
   @override
   void initState() {
     super.initState();
     _fetchUserData();
-    
   }
 
   Future<void> _fetchUserData() async {
@@ -34,6 +37,9 @@ class _ProfileViewState extends State<ProfileView> {
       setState(() {
         _username = userData?['user']['username'];
         _profileImageUrl = userData?['user']['profileImage'];
+        userId = userData?['user']['_id'];
+        _firstName = userData?['user']['firstName'];
+        _lastName = userData?['user']['lastName'];
       });
     } catch (e) {
       print('Error fetching user data: $e');
@@ -45,9 +51,12 @@ class _ProfileViewState extends State<ProfileView> {
     try {
       await _authRepository.logoutUser(token!);
       if (mounted) {
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context, rootNavigator: true).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const LoginView(),
+            builder: (context) => RepositoryProvider(
+              create: (context) => AuthRepository(),
+              child: const LoginView(),
+            ),
           ),
         );
       }
@@ -72,10 +81,12 @@ class _ProfileViewState extends State<ProfileView> {
           children: [
             _followerSection(),
             const SizedBox(height: 20),
+            _nameSection(),
+            const SizedBox(height: 20),
             _editProfileSection(),
             const SizedBox(height: 20),
-             ShowOwnerPost(),
-             //dropDown()
+            ShowOwnerPost(),
+            //dropDown()
             //),
           ],
         ),
@@ -87,58 +98,47 @@ class _ProfileViewState extends State<ProfileView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
-              ? NetworkImage(
-                'http://localhost:3000/media?media_id=$_profileImageUrl'
-              )
-              : const AssetImage('image/logo.png') as ImageProvider,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 30.0),
+              child: CircleAvatar(
+                radius: 75,
+                backgroundImage: _profileImageUrl != null &&
+                        _profileImageUrl!.isNotEmpty
+                    ? NetworkImage(
+                        'http://localhost:3000/media?media_id=$_profileImageUrl')
+                    : const AssetImage('image/logo.png') as ImageProvider,
+              ),
+            ),
+          ],
         ),
         const SizedBox(width: 40),
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '123',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              'followers',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
+      ],
+    );
+  }
+
+  Widget _nameSection() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          _firstName ?? 'First Name',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
         ),
-        const VerticalDivider(
-          color: Colors.black,
-          thickness: 1,
-          width: 20,
-        ),
-        const SizedBox(width: 60),
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '321',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              'following',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
+        const SizedBox(width: 10),
+        Text(
+          _lastName ?? 'Last Name',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
         ),
       ],
     );
@@ -254,24 +254,25 @@ class _ProfileViewState extends State<ProfileView> {
                       ],
                     ),
                   ), */
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const EditProfile(),
-                                  settings: const RouteSettings(name: '/editProfile'),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfile(),
+                                settings:
+                                    const RouteSettings(name: '/editProfile'),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
               const Divider(color: AppColors.primaryColor),
@@ -287,13 +288,14 @@ class _ProfileViewState extends State<ProfileView> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.chevron_right),
-                          onPressed: (){
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const ChangePw(),
-                                  settings: const RouteSettings(name: '/changePw'),
-                                ),
-                              );
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const ChangePw(),
+                                settings:
+                                    const RouteSettings(name: '/changePw'),
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -349,32 +351,52 @@ class _ProfileViewState extends State<ProfileView> {
   }
 }
 
-class ShowOwnerPost extends StatelessWidget {
+class ShowOwnerPost extends StatefulWidget {
+  @override
+  _ShowOwnerPostState createState() => _ShowOwnerPostState();
+}
+
+class _ShowOwnerPostState extends State<ShowOwnerPost> {
   final AuthRepository _authRepository = AuthRepository();
   late Future<List<dynamic>> _postFuture;
+  late String userId;
 
   @override
   void initState() {
+    super.initState();
     _postFuture = getAllPost();
+    _authRepository.fetchUserData().then((userData) {
+      setState(() {
+        userId = userData?['user']['_id'];
+      });
+    });
     refreshPosts();
   }
 
   Future<List<dynamic>> getAllPost() async {
-    final postList = await _authRepository.fetchOwnerPost();
-    return postList.map((post) => PostWidget(
-      username: post['user_name'] ?? '',
-      userImage: post['profileImage'] ?? '',
-      postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
-      postImageTwo: 'http://localhost:3000/media?media_id=${post['reference_photo']}',
-      status: post['artist_post'] == false ? 'Looking for artist' : 'Upcycled by Me',
-      productName: post['name'] ?? '',
-      productPrice: post['price'] ?? '',
-      description: post['description'] ?? '',
-    )).toList();
+    final postList = await _authRepository.ownProfilePost(userId: userId);
+    return postList
+        .map((post) => PostWidget(
+              postId: post['_id'] ?? '',
+              username: post['user_name'] ?? '',
+              userImage: post['profileImage'] ?? '',
+              postImageOne:
+                  'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+              postImageTwo:
+                  'http://localhost:3000/media?media_id=${post['reference_photo']}',
+              status: post['artist_post'] == false
+                  ? 'Looking for artist'
+                  : 'Upcycled by Me',
+              productName: post['name'] ?? '',
+              productPrice: post['price'] ?? '',
+              description: post['description'] ?? '',
+            ))
+        .toList();
   }
+
   void refreshPosts() {
     //setState(() {
-      _postFuture = getAllPost();
+    _postFuture = getAllPost();
     //});
   }
 
@@ -391,7 +413,7 @@ class ShowOwnerPost extends StatelessWidget {
           return const Center(child: Text('No posts available'));
         } else {
           final posts = snapshot.data!;
-           return ListView.builder(
+          return ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: posts.length,
@@ -405,9 +427,8 @@ class ShowOwnerPost extends StatelessWidget {
   }
 }
 
-
 class PostWidget extends StatelessWidget {
-  //final String postId;
+  final String postId;
   //final String userId;
   final String username;
   final String userImage;
@@ -418,10 +439,10 @@ class PostWidget extends StatelessWidget {
   final String productPrice;
   final String description;
 
-   const PostWidget({
-    super.key, 
-    //required this.postId,
-   // required this.userId,
+  const PostWidget({
+    super.key,
+    required this.postId,
+    // required this.userId,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -447,7 +468,9 @@ class PostWidget extends StatelessWidget {
         color: AppColors.backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
-          side: const BorderSide(color: AppColors.textColor, width: 1.0), // Set border color and width
+          side: const BorderSide(
+              color: AppColors.textColor,
+              width: 1.0), // Set border color and width
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -458,85 +481,132 @@ class PostWidget extends StatelessWidget {
                 children: [
                   const SizedBox(width: 8),
                   ClipOval(
-                      child: userImage != 'null' && userImage.isNotEmpty
+                    child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                           'http://localhost:3000/media?media_id=$userImage',
+                            'http://localhost:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
                           )
-                        :  Image.asset('image/logo.png', width: 60, height: 60),
-                    ),
+                        : Image.asset('image/logo.png', width: 60, height: 60),
+                  ),
                   const SizedBox(width: 4),
                   TextButton(
-                  style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.transparent;
-                      }
-                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
-                        return Colors.transparent;
-                      }
-                      return null; // Defer to the widget's default.
-                    },
-                  ),
-                ),
-                    onPressed: (){
-
-                    },
-                     child: Text(
-                    username,
-                    style:const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textColor
+                    style: ButtonStyle(
+                      overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.hovered)) {
+                            return Colors.transparent;
+                          }
+                          if (states.contains(MaterialState.focused) ||
+                              states.contains(MaterialState.pressed)) {
+                            return Colors.transparent;
+                          }
+                          return null; // Defer to the widget's default.
+                        },
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      username,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor),
                     ),
                   ),
-                    ),
-                    const Spacer(),
-                    DropDown(),
-                    IconButton(
-                          icon: const Icon(CupertinoIcons.delete),
-                          onPressed: (){},
-                        ),            
+                  const Spacer(),
+                  DropDown(postId: postId),
+                  IconButton(
+                    icon: const Icon(CupertinoIcons.delete),
+                    onPressed: () {},
+                  ),
                 ],
               ),
               SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Image.network(
-                            postImageOne,
-                            height: 100,
-                          ),
-                          Text('Original Product'),
-                        ],
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                              ),
+                              child: Image.network(
+                                postImageOne,
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              (status) == 'Looking for artist'
+                                  ? 'Original Product'
+                                  : 'Before',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    SizedBox(width: 0),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Image.network(
-                            postImageTwo,
-                            height: 100,
-                          ),
-                          Text('Reference'),
-                        ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10.0),
+                                topRight: Radius.circular(10.0),
+                              ),
+                              child: Image.network(
+                                postImageTwo,
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              (status) == 'Looking for artist'
+                                  ? 'Reference'
+                                  : 'After',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -562,7 +632,7 @@ class PostWidget extends StatelessWidget {
               SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -588,7 +658,7 @@ class PostWidget extends StatelessWidget {
               SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -611,10 +681,10 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -648,6 +718,8 @@ class PostWidget extends StatelessWidget {
 }
 
 class DropDown extends StatefulWidget {
+  final String postId;
+  const DropDown({super.key, required this.postId});
   @override
   DropDownState createState() => DropDownState();
 }
@@ -659,6 +731,18 @@ class DropDownState extends State<DropDown> {
     'Hide from Feed',
     //'Delete Post',
   ];
+  bool status = true;
+  //post status update
+  Future<void> updatePostShowHide() async {
+    try {
+      final response = await AuthRepository().show_postStatus(
+        postId: widget.postId,
+        status: dropdownValue == 'Show Post' ? true : false,
+      );
+    } catch (e) {
+      print('Error updating post status: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -668,7 +752,7 @@ class DropDownState extends State<DropDown> {
       decoration: BoxDecoration(
         //filled: false,
         //color: AppColors.backgroundColor,
-        border: Border.all(color: AppColors.textColor, width: 1.0),      
+        border: Border.all(color: AppColors.textColor, width: 1.0),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Center(
@@ -676,7 +760,7 @@ class DropDownState extends State<DropDown> {
           value: dropdownValue,
           icon: const Icon(Icons.keyboard_arrow_down),
           iconSize: 24,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             color: AppColors.textColor,
           ),
@@ -687,6 +771,7 @@ class DropDownState extends State<DropDown> {
           onChanged: (String? newValue) {
             setState(() {
               dropdownValue = newValue!;
+              updatePostShowHide();
             });
           },
           items: _items.map<DropdownMenuItem<String>>((String value) {

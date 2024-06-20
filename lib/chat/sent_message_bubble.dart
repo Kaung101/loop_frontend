@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:loop/chat/chat_state.dart';
 import 'package:loop/components/colors.dart';
 
 class SentMessageBubble extends StatelessWidget {
   final String message;
+  final MessageType type;
+
   const SentMessageBubble({
     super.key,
     required this.message,
+    required this.type,
   });
 
   @override
@@ -26,10 +32,12 @@ class SentMessageBubble extends StatelessWidget {
                 bottomRight: Radius.circular(18),
               ),
             ),
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-            ),
+            child: type == MessageType.text
+                ? Text(
+                    message,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  )
+                : Image.memory(base64Decode(message), width: 150),
           ),
         ),
         // CustomPaint(painter: Triangle(Colors.grey[900])),

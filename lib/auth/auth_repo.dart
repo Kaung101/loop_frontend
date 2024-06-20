@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:loop/other_profile/other_profile.dart';
+import 'package:loop/user_management/view_profile.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 class AuthRepository {
@@ -155,6 +156,8 @@ Future<void> logoutUser(String token) async {
     }else{
       return [];
     }
+
+
   }
   //get other profile post
   Future<List<dynamic>> otherProfilePost({required String userId}) async {
@@ -285,7 +288,7 @@ Future<String?> uploadProfilePhoto( {required XFile profilePhoto}) async {
     try{
           final bytes = await profilePhoto.readAsBytes();
           String? base64Image = base64Encode(bytes);
-          print(base64Image);
+          //print(base64Image);
       final response = await dio.post(
         Uri.parse('$baseUrl/api/auth/uploadProfilePhoto').toString(),
         options: Options(
@@ -397,6 +400,39 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
     print('Error changing password: $e');
     return 'Error changing password';
   }
+ }
+ //new condition of own profile all post
+ //get other profile post
+  Future<List<dynamic>> ownProfilePost({required String userId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/owner/ownerProfilePost/$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if(response.statusCode == 200){
+      return jsonDecode(response.body);
+    }else{
+      return [];
+    }
+  }
+
+
+  //update show_post status
+  //update password
+  Future<bool> show_postStatus({required String postId, required bool status}) async{
+   
+    final response = await http.put(
+      Uri.parse('$baseUrl/show/updatePost'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'postId': postId,
+        'dropdownValue': status,
+      }),
+    );
+    if(response.body == 'true'){
+      return true;
+  }  
+  return false;
+  }
 }
 
 
@@ -439,4 +475,4 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
       return false;
     } */
   
-}
+ //}}
