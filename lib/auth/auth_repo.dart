@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:loop/other_profile/other_profile.dart';
+import 'package:loop/user_management/view_profile.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 class AuthRepository {
@@ -109,7 +111,6 @@ Future<void> logoutUser(String token) async {
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
-        print(response.body);
           return jsonDecode(response.body);
         //return jsonDecode(response.body);
       }
@@ -139,7 +140,6 @@ Future<void> logoutUser(String token) async {
       headers: {'Content-Type': 'application/json'},
     );
     if(response.statusCode == 200){
-      print(response.body);
       return jsonDecode(response.body);
     }else{
       return [];
@@ -156,6 +156,8 @@ Future<void> logoutUser(String token) async {
     }else{
       return [];
     }
+
+
   }
   //get other profile post
   Future<List<dynamic>> otherProfilePost({required String userId}) async {
@@ -195,11 +197,9 @@ Future<void> logoutUser(String token) async {
         'lastName': lastName,
         'username': username,}),
     );
-    print(response.body);
-    if(response.body == 'true'){
-      
+    if(response.body != 'null'){
       return true;
-  }  
+    }
   return false;
   }
 
@@ -211,7 +211,6 @@ Future<void> logoutUser(String token) async {
     final String? imageMime = lookupMimeType(image.path);
     final imageMimeType = MediaType.parse(imageMime!);
 
-    print(imageStr);
     final response = await http.put(
       Uri.parse('$baseUrl/api/auth/editProfileImage'),
       headers: {'Content-Type': 'application/json'},
@@ -228,5 +227,178 @@ Future<void> logoutUser(String token) async {
     return false;
   }
 
+/* 
+  //edit profile
+  Future<bool> editProfile({required String firstName, required String lastName, required String username, required String email}) async{
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/auth/editProfile'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'firstName': firstName,
+        'lastName': lastName,
+        'username': username,}),
+    );
+    if(response.body == 'true'){
+      return true;
+  }  
+  return false;
+  } */
 
+  // Future<String?> uploadProfilePhoto(Uint8List imageBytes) async {
+  //   final uploadUrl = '$baseUrl/api/auth/me'; // Replace with your actual API endpoint
+  //   try {
+  //     final request = http.MultipartRequest('POST', Uri.parse(uploadUrl))
+  //       ..files.add(
+  //         http.MultipartFile.fromBytes(
+  //           'file',
+  //           imageBytes,
+  //           filename: 'profile_photo.png',
+  //           contentType: MediaType('image', 'png'),
+  //         ),
+  //       );
+
+  //     final response = await request.send();
+
+  //     if (response.statusCode == 200) {
+  //       final responseBody = await http.Response.fromStream(response);
+  //       final responseData = json.decode(responseBody.body);
+  //       return responseData['url'];
+  //     } else {
+  //       print('Failed to upload profile photo. Status code: ${response.statusCode}');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print('Upload error: $e');
+  //     return null;
+  //   }
+  // }
+Future<String?> uploadProfilePhoto( {required XFile profilePhoto}) async {
+    final token = await storage.read(key: 'jwtToken');
+    if(token == null) return "User is not loggined";
+    final String? photomime = lookupMimeType(profilePhoto.path);
+    final photomimeType = MediaType.parse(photomime!);
+    /* final formData = FormData.fromMap(
+      {
+        'profile_photo': await MultipartFile.fromFile(profilePhoto.path, contentType: photomimeType),
+      }
+    ); */
+    final dio = Dio();
+
+    try{
+          final bytes = await profilePhoto.readAsBytes();
+          String? base64Image = base64Encode(bytes);
+          //print(base64Image);
+      final response = await dio.post(
+        Uri.parse('$baseUrl/api/auth/uploadProfilePhoto').toString(),
+        options: Options(
+          headers: {'Authorization' : "Bearer $token"},
+        ),
+        data: jsonEncode(
+          {
+            'profile_photo': base64Image,
+          }
+        ),
+      );
+    }
+    catch(e){
+      print(e);
+    }
+  }
+
+
+  /* Future<List<Map<String, dynamic>>> fetchUsers(String baseUrl, {String? searchQuery}) async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/api/auth/users'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      
+      // Filter users based on search query
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        data = data.where((user) => user['username'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      }
+      
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to fetch users');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
+  }
+} */
+
+Future<List<Map<String, dynamic>>> fetchUsers(String? searchQuery) async {
+  try {
+    final response = await http.get(Uri.parse('$baseUrl/api/auth/users'));
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      
+      // Filter users based on search query
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        data = data.where((user) => user['username'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      }
+      
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to fetch users');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/show/allPost'));
+     
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+
+        // Filter posts based on search query
+        if (searchQuery != null && searchQuery.isNotEmpty) {
+          data = data.where((post) => post['name'].toLowerCase().contains(searchQuery.toLowerCase()) ||
+                                      post['description'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
+        }
+        
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Failed to fetch posts');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+ //new condition of own profile all post
+ //get other profile post
+  Future<List<dynamic>> ownProfilePost({required String userId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/owner/ownerProfilePost/$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if(response.statusCode == 200){
+      return jsonDecode(response.body);
+    }else{
+      return [];
+    }
+  }
+
+
+  //update show_post status
+  //update password
+  Future<bool> show_postStatus({required String postId, required bool status}) async{
+   
+    final response = await http.put(
+      Uri.parse('$baseUrl/show/updatePost'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'postId': postId,
+        'dropdownValue': status,
+      }),
+    );
+    if(response.body == 'true'){
+      return true;
+  }  
+  return false;
+  }
 }

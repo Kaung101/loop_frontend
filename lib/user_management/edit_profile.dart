@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
@@ -36,7 +37,6 @@ class _EditProfileState extends State<EditProfile> {
         userId = userData?['user']['_id'];
         _usernameController.text = userData?['user']['username'] ?? '';
         _profilePhotoUrl = userData?['user']['profileImage'] ?? '';
-        print("$_profilePhotoUrl from edit profile");
         _emailController.text = userData?['user']['email'] ?? '';
         _firstNameController.text = userData?['user']['firstName'] ?? '';
         _lastNameController.text = userData?['user']['lastName'] ?? '';
@@ -105,7 +105,7 @@ class _EditProfileState extends State<EditProfile> {
         backgroundColor: AppColors.backgroundColor,
         leading: ModalRoute.of(context)?.canPop == true
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(CupertinoIcons.left_chevron, color: AppColors.textColor),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -143,8 +143,8 @@ class _EditProfileState extends State<EditProfile> {
                                   errorBuilder: (context, error, stackTrace) {
                                     print("Error loading image: $error");
                                     return Image.asset(
-                                      //'image/logo.png',
-                                      '',
+                                      'image/logo.png',
+                                      
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
@@ -152,8 +152,8 @@ class _EditProfileState extends State<EditProfile> {
                                   },
                                 )
                               : Image.asset(
-                                 // 'image/logo.png',
-                                  '',
+                                 'image/logo.png',
+                                  
                                   width: 200,
                                   height: 200,
                                 )),
@@ -293,7 +293,7 @@ class _EditProfileState extends State<EditProfile> {
                 controller: _emailController,
                 enabled: false,
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 55),
               // Save Button
               Align(
                 child: Padding(

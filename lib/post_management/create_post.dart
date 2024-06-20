@@ -241,7 +241,7 @@ class _CreatePostState extends State<CreatePost> {
                       MaterialPageRoute(
                         builder: (context) => RepositoryProvider(
                           create: (context) => AuthRepository(),
-                          child: const HomeScreen(),
+                          child: const BottomNav(),
                         ),
                       ),
                     );
