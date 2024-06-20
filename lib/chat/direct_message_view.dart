@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loop/chat/chat_bloc.dart';
 import 'package:loop/chat/chat_event.dart';
 import 'package:loop/chat/chat_state.dart';
@@ -8,6 +12,7 @@ import 'package:loop/chat/received_message_bubble.dart';
 import 'package:loop/chat/sent_message_bubble.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
+import 'package:mime/mime.dart';
 import 'package:tuple/tuple.dart';
 
 class DirectMessageView extends StatefulWidget {
@@ -21,14 +26,29 @@ class DirectMessageView extends StatefulWidget {
 
 class _DirectMessageViewState extends State<DirectMessageView> {
   final TextEditingController _chatInputController = TextEditingController();
+  Uint8List? _pickedFile;
+  XFile? picked;
+  final _buttonStyle = ButtonStyle(
+    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+      (Set<MaterialState> states) {
+        if (states.contains(MaterialState.hovered)) {
+          return Colors.transparent;
+        }
+        if (states.contains(MaterialState.focused) ||
+            states.contains(MaterialState.pressed)) {
+          return Colors.transparent;
+        }
+        return null; // Defer to the widget's default.
+      },
+    ),
+  );
 
   List<Widget> _buildMessage(ChatState state) {
-    print(widget.userId);
     return List.from(state.messages[widget.userId]!.map((message) {
       if (message.from == widget.userId.item1) {
         return ReceivedMessageBubble(message: message.content);
       } else {
-        return SentMessageBubble(message: message.content);
+        return SentMessageBubble(message: message.content, type: message.type);
       }
     }));
   }
@@ -65,46 +85,105 @@ class _DirectMessageViewState extends State<DirectMessageView> {
         ),
       ),
       body: BlocBuilder<ChatBloc, ChatState>(builder: (context, state) {
+        OverlayPortalController _overlayController = OverlayPortalController();
         return Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
                 Expanded(child: ListView(children: _buildMessage(state))),
-                TextField(
-                  controller: _chatInputController,
-                  decoration: InputDecoration(
-                      fillColor: AppColors.backgroundColor,
-                      filled: true,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: IconButton(
-                            color: AppColors.primaryColor,
-                            icon: const Icon(Icons.image_outlined),
-                            style: ButtonStyle(
-                              overlayColor:
-                                  MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.hovered)) {
-                                    return Colors.transparent;
-                                  }
-                                  if (states.contains(MaterialState.focused) ||
-                                      states.contains(MaterialState.pressed)) {
-                                    return Colors.transparent;
-                                  }
-                                  return null; // Defer to the widget's default.
-                                },
-                              ),
-                            ),
-                            onPressed: () {}),
-                      )),
-                  onEditingComplete: () async {
-                    context.read<ChatBloc>().add(SendMessage(
-                        content: _chatInputController.text, to: widget.userId.item1, toUser: widget.userId.item2));
-                    _chatInputController.text = '';
-                  },
-                ),
+                Row(children: [
+                  Expanded(
+                      child: TextField(
+                    controller: _chatInputController,
+                    decoration: InputDecoration(
+                        fillColor: AppColors.backgroundColor,
+                        filled: true,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: IconButton(
+                              color: AppColors.primaryColor,
+                              icon: const Icon(Icons.image_outlined),
+                              style: _buttonStyle,
+                              onPressed: () async {
+                                final ImagePicker imagePicker = ImagePicker();
+                                final pickedFile = await imagePicker.pickImage(
+                                    source: ImageSource.gallery);
+                                if (pickedFile != null) {
+                                  _pickedFile = await pickedFile.readAsBytes();
+                                  picked = pickedFile;
+                                  _overlayController.show();
+                                }
+                              }),
+                        )),
+                    onEditingComplete: () async {
+                      context.read<ChatBloc>().add(SendMessage(
+                          content: _chatInputController.text,
+                          to: widget.userId.item1,
+                          toUser: widget.userId.item2));
+                      _chatInputController.text = '';
+                    },
+                  )),
+                  IconButton(
+                    color: AppColors.primaryColor,
+                    icon: const Icon(Icons.send),
+                    style: _buttonStyle,
+                    onPressed: () {
+                      if (_pickedFile != null) {
+                        final file = base64Encode(_pickedFile!);
+                        final String? mime = lookupMimeType(picked!.path);
+                        context.read<ChatBloc>().add(SendMediaMessage(
+                              content: file,
+                              to: widget.userId.item1,
+                              toUser: widget.userId.item2,
+                              mimetype: mime!,
+                            ));
+                        _overlayController.hide();
+                        _pickedFile = null;
+                      } else if (_chatInputController.text.isNotEmpty) {
+                        context.read<ChatBloc>().add(SendMessage(
+                            content: _chatInputController.text,
+                            to: widget.userId.item1,
+                            toUser: widget.userId.item2));
+                        _chatInputController.text = '';
+                      }
+                    },
+                  ),
+                ]),
+                OverlayPortal(
+                    controller: _overlayController,
+                    overlayChildBuilder: (BuildContext build) {
+                      return Positioned(
+                          right: 20,
+                          bottom: 100,
+                          child: _pickedFile != null
+                              ? Stack(children: [
+                                  Image.memory(width: 125, _pickedFile!),
+                                  Positioned(
+                                      top: 5,
+                                      right: 5,
+                                      child: Align(
+                                          alignment: Alignment.topRight,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              _overlayController.hide();
+                                              _pickedFile = null;
+                                            },
+                                            child: const CircleAvatar(
+                                                backgroundColor:
+                                                    AppColors.primaryColor,
+                                                radius: 10,
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 15,
+                                                  color:
+                                                      AppColors.backgroundColor,
+                                                )),
+                                          ))),
+                                ])
+                              : Container());
+                    }),
               ],
             ));
       }),
