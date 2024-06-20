@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -378,6 +380,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
     return postList
         .map((post) => PostWidget(
               postId: post['_id'] ?? '',
+              showOnFeed: post['show_post'] ?? '',
               username: post['user_name'] ?? '',
               userImage: post['profileImage'] ?? '',
               postImageOne:
@@ -429,7 +432,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
 
 class PostWidget extends StatelessWidget {
   final String postId;
-  //final String userId;
+  final bool showOnFeed;
   final String username;
   final String userImage;
   final String postImageOne;
@@ -442,7 +445,7 @@ class PostWidget extends StatelessWidget {
   const PostWidget({
     super.key,
     required this.postId,
-    // required this.userId,
+    required this.showOnFeed,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -516,7 +519,7 @@ class PostWidget extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  DropDown(postId: postId),
+                  DropDown(postId: postId, showOnFeed: showOnFeed),
                   IconButton(
                     icon: const Icon(CupertinoIcons.delete),
                     onPressed: () {},
@@ -719,13 +722,19 @@ class PostWidget extends StatelessWidget {
 
 class DropDown extends StatefulWidget {
   final String postId;
-  const DropDown({super.key, required this.postId});
+  final bool showOnFeed;
+  const DropDown({super.key, required this.postId , required this.showOnFeed});
   @override
   DropDownState createState() => DropDownState();
 }
 
 class DropDownState extends State<DropDown> {
-  String dropdownValue = 'Show Post';
+  late String dropdownValue;
+  @override
+  void initState() {
+    super.initState();
+    dropdownValue = widget.showOnFeed == true ? 'Show Post' : 'Hide from Feed';
+  }
   final List<String> _items = [
     'Show Post',
     'Hide from Feed',
