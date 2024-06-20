@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:loop/other_profile/other_profile.dart';
+import 'package:loop/user_management/view_profile.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 class AuthRepository {
@@ -383,4 +384,21 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
   }
 
 
+  //update show_post status
+  //update password
+  Future<bool> show_postStatus({required String postId, required bool status}) async{
+   
+    final response = await http.put(
+      Uri.parse('$baseUrl/show/updatePost'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'postId': postId,
+        'dropdownValue': status,
+      }),
+    );
+    if(response.body == 'true'){
+      return true;
+  }  
+  return false;
+  }
 }

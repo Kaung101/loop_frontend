@@ -21,6 +21,8 @@ class _ProfileViewState extends State<ProfileView> {
   String? _username;
   String? _profileImageUrl;
   String? userId;
+  String? _firstName;
+  String? _lastName;
 
   @override
   void initState() {
@@ -36,6 +38,8 @@ class _ProfileViewState extends State<ProfileView> {
         _username = userData?['user']['username'];
         _profileImageUrl = userData?['user']['profileImage'];
         userId = userData?['user']['_id'];
+        _firstName = userData?['user']['firstName'];
+        _lastName = userData?['user']['lastName'];
       });
     } catch (e) {
       print('Error fetching user data: $e');
@@ -74,6 +78,8 @@ class _ProfileViewState extends State<ProfileView> {
           children: [
             _followerSection(),
             const SizedBox(height: 20),
+            _nameSection(),
+            const SizedBox(height: 20),
             _editProfileSection(),
             const SizedBox(height: 20),
              ShowOwnerPost(),
@@ -89,63 +95,50 @@ class _ProfileViewState extends State<ProfileView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
-              ? NetworkImage(
-                'http://localhost:3000/media?media_id=$_profileImageUrl'
-              )
-              : const AssetImage('image/logo.png') as ImageProvider,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left:30.0),
+              child: CircleAvatar(
+                radius: 75,
+                backgroundImage: _profileImageUrl != null && _profileImageUrl!.isNotEmpty
+                    ? NetworkImage(
+                      'http://localhost:3000/media?media_id=$_profileImageUrl'
+                    )
+                    : const AssetImage('image/logo.png') as ImageProvider,
+              ),
+            ),
+          ],
         ),
         const SizedBox(width: 40),
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '123',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              'followers',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
+      ],
+    );
+  }
+  Widget _nameSection(){
+    return  Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          _firstName ?? 'First Name',
+          style: const  TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
         ),
-        const VerticalDivider(
-          color: Colors.black,
-          thickness: 1,
-          width: 20,
-        ),
-        const SizedBox(width: 60),
-        const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '321',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 5),
-            Text(
-              'following',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ],
+         const SizedBox(width: 10),
+          Text(
+            _lastName ?? 'Last Name',
+          style: const  TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+          ),
         ),
       ],
     );
   }
-
   void _showDeleteAccountDialog() {
     showDialog(
       context: context,
@@ -376,6 +369,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
   Future<List<dynamic>> getAllPost() async {
     final postList = await _authRepository.ownProfilePost(userId: userId);
     return postList.map((post) => PostWidget(
+      postId: post['_id'] ?? '',
       username: post['user_name'] ?? '',
       userImage: post['profileImage'] ?? '',
       postImageOne: 'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
@@ -421,7 +415,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
 
 
 class PostWidget extends StatelessWidget {
-  //final String postId;
+  final String postId;
   //final String userId;
   final String username;
   final String userImage;
@@ -434,7 +428,7 @@ class PostWidget extends StatelessWidget {
 
    const PostWidget({
     super.key, 
-    //required this.postId,
+    required this.postId,
    // required this.userId,
     required this.username,
     required this.userImage,
@@ -509,7 +503,7 @@ class PostWidget extends StatelessWidget {
                   ),
                     ),
                     const Spacer(),
-                    DropDown(),
+                    DropDown(postId : postId),
                     IconButton(
                           icon: const Icon(CupertinoIcons.delete),
                           onPressed: (){},
@@ -599,7 +593,7 @@ class PostWidget extends StatelessWidget {
               SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -625,7 +619,7 @@ class PostWidget extends StatelessWidget {
               SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -651,7 +645,7 @@ class PostWidget extends StatelessWidget {
               SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -674,10 +668,10 @@ class PostWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -711,6 +705,8 @@ class PostWidget extends StatelessWidget {
 }
 
 class DropDown extends StatefulWidget {
+  final String postId;
+  const DropDown({super.key, required this.postId});
   @override
   DropDownState createState() => DropDownState();
 }
@@ -722,6 +718,20 @@ class DropDownState extends State<DropDown> {
     'Hide from Feed',
     //'Delete Post',
   ];
+  bool status = true;
+  //post status update
+  Future<void> updatePostShowHide() async{
+    try{
+      final response = await AuthRepository().show_postStatus(
+        postId: widget.postId,
+        status: dropdownValue == 'Show Post' ? true : false,
+      );
+     
+    }
+    catch(e){
+      print('Error updating post status: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -739,7 +749,7 @@ class DropDownState extends State<DropDown> {
           value: dropdownValue,
           icon: const Icon(Icons.keyboard_arrow_down),
           iconSize: 24,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             color: AppColors.textColor,
           ),
@@ -750,6 +760,9 @@ class DropDownState extends State<DropDown> {
           onChanged: (String? newValue) {
             setState(() {
               dropdownValue = newValue!;
+              print(dropdownValue);
+              print(widget.postId);
+              updatePostShowHide();
             });
           },
           items: _items.map<DropdownMenuItem<String>>((String value) {
