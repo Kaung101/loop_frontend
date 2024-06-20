@@ -366,4 +366,43 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
     }
   }
 
+
+Future<bool> changePassword( String currentPassword, String newPassword) async {
+  final authToken = await getAuthToken();
+  if (authToken != null){
+     final response = await http.put(
+        Uri.parse('$baseUrl/api/auth/users'),
+        headers: {'Authorization': 'Bearer $authToken'},
+        body: jsonEncode(
+          {
+            'currentPassword': currentPassword,
+            'newPassword': newPassword,
+          }
+        )
+      );
+      if (response.statusCode == 200) {
+          return jsonDecode(response.body);
+        //return jsonDecode(response.body);
+      }
+  }
+        return false;
+
+    /* final response = await http.put(
+
+      Uri.parse('$baseUrl/api/auth/users'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      }),
+    ); */
+
+    /* if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    } */
+  }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loop/components/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:loop/auth/auth_repo.dart'; // Add this import
 
 class ChangePw extends StatefulWidget {
   const ChangePw({super.key});
@@ -24,8 +24,10 @@ class _ChangePwState extends State<ChangePw> {
   final passwordRegex = RegExp(
       r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$");
 
-    @override
-    void initState() {
+  final AuthRepository _authRepo = AuthRepository(); // Add this line
+
+  @override
+  void initState() {
     super.initState();
     passwordVisibleOne = true;
     passwordVisibleTwo = true;
@@ -45,11 +47,15 @@ class _ChangePwState extends State<ChangePw> {
       errorMessage = '';
     });
 
-     /* try {
-      // Verify new password and confirm password match
-      if (newPassword != _newPasswordController.text) {
+    try {
+      bool success = await _authRepo.changePassword(
+        _currentPasswordController.text,
+        newPassword,
+      );
+
+      if (success) {
         Fluttertoast.showToast(
-          msg: 'New password and confirm password do not match',
+          msg: 'Password updated successfully',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           webPosition: "center",
@@ -57,32 +63,27 @@ class _ChangePwState extends State<ChangePw> {
           textColor: AppColors.primaryColor,
           fontSize: 16.0,
         );
-        return;
+      } else {
+        setState(() {
+          errorMessage = 'Error updating password. Please try again.';
+        });
+        _formKey.currentState!.validate();
       }
-    } on catch (e) {
-      // Handle Firebase authentication errors
+    } catch (error) {
       setState(() {
-        errorMessage = 'Wrong current password. Try again.';
+        errorMessage = 'Error updating password. Please try again.';
       });
       _formKey.currentState!.validate();
-    } catch (e) {
-      // Handle other errors
-      setState(() {
-        errorMessage = 'Error updating password';
-      });
-      _formKey.currentState!.validate();
-    } */
+    }
   }
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     const appTitle = "Change Password";
     return MaterialApp(
       title: appTitle,
-      
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.backgroundColor,
-        
       ),
       home: Scaffold(
         appBar: AppBar(
@@ -153,12 +154,12 @@ class _ChangePwState extends State<ChangePw> {
                             //fillColor: Colors.white,
                             filled: false,
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: AppColors.textColor,
-                                  width: 2.0,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
                               ),
+                            ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                               borderSide: const BorderSide(color: Colors.red),
@@ -232,12 +233,12 @@ class _ChangePwState extends State<ChangePw> {
                             fillColor: Colors.white,
                             filled: false,
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: AppColors.textColor,
-                                  width: 2.0,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
                               ),
+                            ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                               borderSide: const BorderSide(color: Colors.red),
@@ -289,12 +290,12 @@ class _ChangePwState extends State<ChangePw> {
                             fillColor: Colors.white,
                             filled: false,
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: AppColors.textColor,
-                                  width: 2.0,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
                               ),
+                            ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                               borderSide: const BorderSide(color: Colors.red),
