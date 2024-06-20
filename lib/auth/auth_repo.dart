@@ -366,8 +366,41 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
     }
   }
 
+ Future<String> changePassword(String email, String currentPassword, String newPassword) async {
+  try {
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/auth/changePassword'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      }),
+    );
 
-Future<bool> changePassword( String currentPassword, String newPassword) async {
+    print('Response Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
+
+    if (response.statusCode == 200) {
+      // Password updated successfully
+      return 'true';
+    } else if (response.statusCode == 400) {
+      // Handle specific error cases
+      final error = jsonDecode(response.body)['error'];
+      return error;
+    } else {
+      // Handle other status codes
+      return 'Failed to update password. Status Code: ${response.statusCode}';
+    }
+  } catch (e) {
+    print('Error changing password: $e');
+    return 'Error changing password';
+  }
+}
+
+
+/* Future<bool> changePassword( String currentPassword, String newPassword) async {
   final authToken = await getAuthToken();
   if (authToken != null){
      final response = await http.put(
@@ -386,6 +419,7 @@ Future<bool> changePassword( String currentPassword, String newPassword) async {
       }
   }
         return false;
+} */
 
     /* final response = await http.put(
 
@@ -404,5 +438,5 @@ Future<bool> changePassword( String currentPassword, String newPassword) async {
     } else {
       return false;
     } */
-  }
+  
 }
