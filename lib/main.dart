@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +18,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'Notification/notification_repo.dart';
 import 'firebase_options.dart';
+import 'package:http/http.dart' as http;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('received message');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupFlutterNotifications();
   showFlutterNotification(message);
@@ -41,7 +43,7 @@ Future<void> setupFlutterNotifications() async {
     'high_importance_channel', // id
     'High Importance Notifications', // title
     description:
-    'This channel is used for important notifications.', // description
+        'This channel is used for important notifications.', // description
     importance: Importance.high,
   );
 
@@ -53,7 +55,7 @@ Future<void> setupFlutterNotifications() async {
   /// default FCM channel to enable heads up notifications.
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
   /// Update the iOS foreground notification presentation options to allow
@@ -67,26 +69,26 @@ Future<void> setupFlutterNotifications() async {
 }
 
 Future<void> showFlutterNotification(RemoteMessage message) async {
-  RemoteNotification? notification = message.notification;
-  AndroidNotification? android = message.notification?.android;
-  if (notification != null && android != null && !kIsWeb) {
-    print('i am in');
-    await flutterLocalNotificationsPlugin.show(
-      notification.hashCode,
-      notification.title,
-      notification.body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          channelDescription: channel.description,
-          // TODO add a proper drawable resource to android, for now using
-          //      one that already exists in example app.
-          icon: 'launch_background',
-        ),
-      ),
-    );
+  BigPictureStyleInformation? bigPictureStyleInformation;
+  if (message.data['body']!.startsWith('http://10.0.2.2')) {
+    final http.Response response =
+        await http.get(Uri.parse(message.data['body']));
+    bigPictureStyleInformation = BigPictureStyleInformation(
+        ByteArrayAndroidBitmap.fromBase64String(
+            base64Encode(response.bodyBytes)),
+        largeIcon: ByteArrayAndroidBitmap.fromBase64String(
+            base64Encode(response.bodyBytes)));
   }
+
+  await flutterLocalNotificationsPlugin.show(
+      message.hashCode,
+      message.data['title'],
+      bigPictureStyleInformation == null ? message.data['body'] : '',
+      NotificationDetails(
+          android: AndroidNotificationDetails(channel.id, channel.name,
+              icon: 'launch_background',
+              channelDescription: channel.description,
+              styleInformation: bigPictureStyleInformation)));
 }
 
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
@@ -112,9 +114,13 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider(authRepository)),
-        BlocProvider<CreatePostBloc>(create: (_) => CreatePostBloc(postRepo: postRepository)),
-        BlocProvider<ChatBloc>(create: (_) => ChatBloc(chatRepo: chatRepository)),
-        BlocProvider<NotificationBloc>(create: (_) => NotificationBloc(notificationRepo: notificationRepository))
+        BlocProvider<CreatePostBloc>(
+            create: (_) => CreatePostBloc(postRepo: postRepository)),
+        BlocProvider<ChatBloc>(
+            create: (_) => ChatBloc(chatRepo: chatRepository)),
+        BlocProvider<NotificationBloc>(
+            create: (_) =>
+                NotificationBloc(notificationRepo: notificationRepository))
       ],
       child: const MyApp(),
     ),
@@ -136,7 +142,3 @@ class MyApp extends StatelessWidget {
     });
   }
 }
-
-
-
-
