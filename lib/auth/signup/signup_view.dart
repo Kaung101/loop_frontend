@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
@@ -31,6 +32,7 @@ class _SignUpViewState extends State<SignUpView> {
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: BlocProvider(
           create: (context) =>
               SignUpBloc(authRepo: context.read<AuthRepository>()),
@@ -41,8 +43,7 @@ class _SignUpViewState extends State<SignUpView> {
   }
 
   Widget _usernameField() {
-    return SingleChildScrollView(
-      child: BlocBuilder<SignUpBloc, SignUpState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
           return TextFormField(
             decoration: InputDecoration(
@@ -65,13 +66,12 @@ class _SignUpViewState extends State<SignUpView> {
                 .add(SignUpUsernameChanged(username: value)),
           );
         },
-      ),
-    );
+      );
+    //);
   }
 
   Widget _emailField() {
-    return SingleChildScrollView(
-      child: BlocBuilder<SignUpBloc, SignUpState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
           return TextFormField(
             decoration: InputDecoration(
@@ -93,13 +93,12 @@ class _SignUpViewState extends State<SignUpView> {
                 context.read<SignUpBloc>().add(SignUpEmailChanged(email: value)),
           );
         },
-      ),
-    );
+      );
+    
   }
 
   Widget _passwordField() {
-    return SingleChildScrollView(
-      child: BlocBuilder<SignUpBloc, SignUpState>(
+    return  BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
           return TextFormField(
             obscureText: _obscurePassword,
@@ -142,13 +141,12 @@ class _SignUpViewState extends State<SignUpView> {
                 .add(SignUpPasswordChanged(password: value)),
           );
         },
-      ),
-    );
+      );
+    
   }
 
   Widget _confirmPasswordField() {
-    return SingleChildScrollView(
-      child: BlocBuilder<SignUpBloc, SignUpState>(
+    return BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
           return TextFormField(
             obscureText: _obscureConfirmPassword,
@@ -191,13 +189,11 @@ class _SignUpViewState extends State<SignUpView> {
                 .add(SignUpConfirmPasswordChanged(confirmPassword: value)),
           );
         },
-      ),
-    );
+      );
   }
 
   Widget _signUpButton() {
-    return SingleChildScrollView(
-      child: BlocBuilder<SignUpBloc, SignUpState>(
+    return  BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
           if (state.formStatus is SubmissionFailed) {
             print(state.errorMessage);
@@ -250,12 +246,11 @@ class _SignUpViewState extends State<SignUpView> {
             ),
           );
         },
-      ),
-    );
+      );
   }
 
   Widget _alreadyHaveAccount() {
-    return Expanded(
+    return SafeArea(
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Row(
@@ -304,81 +299,86 @@ class _SignUpViewState extends State<SignUpView> {
   }
 
   Widget _signUpForm() {
-    return Form(
-      key: _formKey,
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 100),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    'image/loop_logo.svg',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+    return Column(
+      children:[ Expanded(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+          child: Form(
+            key: _formKey,
+              child:  Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Username',
-                        style: TextStyle(
-                            color: AppColors.textColor, fontSize: 13)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'image/loop_logo.svg',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text('Username',
+                              style: TextStyle(
+                                  color: AppColors.textColor, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    _usernameField(),
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text('Email',
+                              style: TextStyle(
+                                  color: AppColors.textColor, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    _emailField(),
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text('Password',
+                              style: TextStyle(
+                                  color: AppColors.textColor, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    _passwordField(),
+                    const SizedBox(height: 10),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text('Confirm Password',
+                              style: TextStyle(
+                                  color: AppColors.textColor, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                    _confirmPasswordField(),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: _signUpButton()),
                   ],
                 ),
-              ),
-              _usernameField(),
-              const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text('Email',
-                        style: TextStyle(
-                            color: AppColors.textColor, fontSize: 13)),
-                  ],
-                ),
-              ),
-              _emailField(),
-              const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text('Password',
-                        style: TextStyle(
-                            color: AppColors.textColor, fontSize: 13)),
-                  ],
-                ),
-              ),
-              _passwordField(),
-              const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text('Confirm Password',
-                        style: TextStyle(
-                            color: AppColors.textColor, fontSize: 13)),
-                  ],
-                ),
-              ),
-              _confirmPasswordField(),
-              const SizedBox(height: 20),
-              _signUpButton(),
-              _alreadyHaveAccount(),
-            ],
           ),
         ),
       ),
+      _alreadyHaveAccount()
+      ],
     );
   }
 }
