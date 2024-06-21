@@ -18,8 +18,7 @@
 
 //   @override
 //   _LoginViewState createState() => _LoginViewState();
-  
-  
+
 // }
 
 // class _LoginViewState extends State<LoginView> {
@@ -32,7 +31,7 @@
 //   void initState() {
 //     super.initState();
 //     _checkLoginStatus();
-    
+
 //   }
 //   Future<void> _checkLoginStatus() async {
 //     final isLoggedIn = await authRepo.isLoggedIn();
@@ -44,8 +43,6 @@
 //       );
 //     }
 //   }
-
-
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -128,7 +125,7 @@
 //               ),
 //             ),
 //             validator:(value){
-      
+
 //               if(value!.isEmpty){
 //                 return 'Password is required';
 //               }
@@ -139,13 +136,13 @@
 //                 print(state.errorMessage);
 //                 return state.errorMessage;
 //               }
-      
+
 //               return null;
-            
+
 //             } ,
 //             //validator: (value) => state.isValidPassword ? null : "Invalid Password",
 //             onChanged: (value) => context.read<LoginBloc>().add(LoginPasswordChanged(password: value)),
-            
+
 //           );
 //         },
 //       ),
@@ -244,9 +241,9 @@
 //                         ),
 //                       ),
 //                     );
-                  
+
 //                   });
-                        
+
 //                       }
 //                     },
 //                     child: const Text(
@@ -260,7 +257,7 @@
 //                   ),
 //                 );
 //         },
-      
+
 //       ),
 //     );
 //   }
@@ -312,7 +309,6 @@
 //       );
 //     //);
 //   }
-
 
 //   Widget _loginForm() {
 //     return Form(
@@ -438,7 +434,8 @@ class _LoginViewState extends State<LoginView> {
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         body: BlocProvider(
-          create: (context) => LoginBloc(authRepo: context.read<AuthRepository>()),
+          create: (context) =>
+              LoginBloc(authRepo: context.read<AuthRepository>()),
           child: _loginForm(),
         ),
       ),
@@ -456,8 +453,20 @@ class _LoginViewState extends State<LoginView> {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          validator: (value) => state.isValidEmail ? null : "Invalid Email",
-          onChanged: (value) => context.read<LoginBloc>().add(LoginemailChanged(email: value)),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter an email address';
+            } else if (!state.isValidEmail) {
+              return 'Invalid Email';
+            } else if (errormsg.isNotEmpty) {
+              return 'Incorrect Email or Password';
+            }
+            return null;
+          },
+
+          //validator: (value) => state.isValidEmail ? null : "Invalid Email",
+          onChanged: (value) =>
+              context.read<LoginBloc>().add(LoginemailChanged(email: value)),
         );
       },
     );
@@ -478,7 +487,9 @@ class _LoginViewState extends State<LoginView> {
               padding: const EdgeInsets.only(right: 10.0),
               child: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                  _obscurePassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
                 ),
                 color: AppColors.primaryColor,
                 onPressed: () {
@@ -493,14 +504,16 @@ class _LoginViewState extends State<LoginView> {
             if (value!.isEmpty) {
               return 'Password is required';
             } else if (errormsg.isNotEmpty) {
-              return 'Incorrect Password';
+              return 'Incorrect Password or Email';
             } else if (state.errorMessage.isNotEmpty) {
               print(state.errorMessage);
               return state.errorMessage;
             }
             return null;
           },
-          onChanged: (value) => context.read<LoginBloc>().add(LoginPasswordChanged(password: value)),
+          onChanged: (value) => context
+              .read<LoginBloc>()
+              .add(LoginPasswordChanged(password: value)),
         );
       },
     );
@@ -514,7 +527,8 @@ class _LoginViewState extends State<LoginView> {
             if (states.contains(MaterialState.hovered)) {
               return Colors.transparent;
             }
-            if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+            if (states.contains(MaterialState.focused) ||
+                states.contains(MaterialState.pressed)) {
               return Colors.transparent;
             }
             return null;
@@ -537,9 +551,7 @@ class _LoginViewState extends State<LoginView> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ForgotPasswordModal()
-                    ],
+                    children: [ForgotPasswordModal()],
                   ),
                 ),
               ),
@@ -568,7 +580,8 @@ class _LoginViewState extends State<LoginView> {
               ),
             ),
             onPressed: () async {
-              errormsg = await authRepo.login(email: state.email, password: state.password);
+              errormsg = await authRepo.login(
+                  email: state.email, password: state.password);
               if (_formKey.currentState!.validate()) {
                 context.read<LoginBloc>().add(LoginSubmitted());
                 Fluttertoast.showToast(
@@ -630,7 +643,8 @@ class _LoginViewState extends State<LoginView> {
                       if (states.contains(MaterialState.hovered)) {
                         return Colors.transparent;
                       }
-                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                      if (states.contains(MaterialState.focused) ||
+                          states.contains(MaterialState.pressed)) {
                         return Colors.transparent;
                       }
                       return null;
@@ -665,7 +679,8 @@ class _LoginViewState extends State<LoginView> {
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 150.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 150.0),
             child: Form(
               key: _formKey,
               child: Column(
@@ -686,7 +701,8 @@ class _LoginViewState extends State<LoginView> {
                       children: [
                         Text(
                           "Email",
-                          style: TextStyle(fontSize: 13, color: AppColors.textColor),
+                          style: TextStyle(
+                              fontSize: 13, color: AppColors.textColor),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -701,7 +717,8 @@ class _LoginViewState extends State<LoginView> {
                       children: [
                         Text(
                           "Password",
-                          style: TextStyle(fontSize: 13, color: AppColors.textColor),
+                          style: TextStyle(
+                              fontSize: 13, color: AppColors.textColor),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -728,5 +745,3 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
-
-
