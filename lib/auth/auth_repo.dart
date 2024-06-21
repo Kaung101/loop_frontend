@@ -433,6 +433,30 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
   }  
   return false;
   }
+
+  //delete post
+  Future<void> deletePost(String postId) async {
+    try{
+      final token = await storage.read(key: 'jwtToken');
+      final response = await http.delete(
+        Uri.parse('$baseUrl/post?post_id=$postId'),
+        headers:{
+          'Authorization': 'Bearer $token',
+      },
+        );
+        if(response.statusCode == 204){
+          print('Post deleted successfully');
+    } else {
+      print('Failed to delete post. Status code: ${response.statusCode}');
+      throw Exception('Failed to delete post');
+    }
+    }catch(e){
+      print('Error deleting post: $e');
+      throw Exception('Error deleting post');
+    }
+    
+  }
+
 }
 
 

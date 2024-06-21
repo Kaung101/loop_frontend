@@ -463,6 +463,111 @@ class PostWidget extends StatelessWidget {
     'Delete Post',
   ];
  */
+  
+void _deletPostTest(){
+  final AuthRepository _authRepository = AuthRepository();
+  _authRepository.deletePost(postId);
+  print("delete");
+  
+}
+
+void _showDeletePostDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: AppColors.backgroundColor,
+          content: const Text(
+            "Are you sure you want to delete your post?",
+            style: TextStyle(
+              color: AppColors.textColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.primaryColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      backgroundColor: AppColors.backgroundColor,
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: (){
+                      print("delete");
+                       _deletPostTest();
+                       Navigator.of(context).pop();
+                       ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Post deleted successfully'),)                
+                       );
+                       Navigator.of(context, 
+                       rootNavigator: true).pushReplacement(
+                         MaterialPageRoute(
+                           builder: (context) => const ProfileView(),
+                         ),
+                       );
+
+                       
+
+                       //_ShowOwnerPostState().getAllPost();
+                      //want to add refresh mehtod here
+                    //_ShowOwnerPostState().refreshPosts();
+                        //refresh getAllPost here
+                      //deletePost(postId: postId);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.primaryColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      backgroundColor: AppColors.tertiaryColor,
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(
+                          color: AppColors.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -521,8 +626,8 @@ class PostWidget extends StatelessWidget {
                   //const Spacer(),
                   DropDown(postId: postId, showOnFeed: showOnFeed),
                   IconButton(
-                    icon: const Icon(CupertinoIcons.delete,),
-                    onPressed: () {},
+                    icon: const Icon(CupertinoIcons.delete),
+                    onPressed: () => _showDeletePostDialog(context),
                   ),
                 ],
               ),
@@ -794,3 +899,54 @@ class DropDownState extends State<DropDown> {
     );
   }
 }
+
+/* class deletePost extends StatefulWidget {
+  final String postId;
+  const deletePost({super.key, required this.postId});
+
+  @override
+  State<deletePost> createState() => _deletePostState();
+}
+
+class _deletePostState extends State<deletePost> {
+  final AuthRepository _authRepository = AuthRepository();
+  late Future<List<dynamic>> _postFuture;
+  late String userId;
+
+    @override
+/*   void initState() {
+    super.initState();
+    _postFuture = getAllPost();
+    _authRepository.fetchUserData().then((userData) {
+      setState(() {
+        userId = userData?['user']['_id'];
+      });
+    });
+    refreshPosts();
+  } */
+ void initState(){
+    super.initState();
+    print("delet from widget");
+    deletePostF();
+ }
+   Future<void> deletePostF() async {
+    try {
+      await AuthRepository().deletePost(widget.postId);
+      print(widget.postId);
+      print('Post ID');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Post deleted successfully')),
+      );
+    } catch (e) {
+      print('Error deleting post: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete post')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+} */
