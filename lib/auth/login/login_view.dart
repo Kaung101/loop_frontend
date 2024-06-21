@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:loop/Notification/notification_event.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/forgotpwd/forgotpwd.dart';
 import 'package:loop/auth/login/login_bloc.dart';
@@ -12,7 +13,9 @@ import 'package:loop/auth/signup/signup_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/chat/chat_bloc.dart';
 import 'package:loop/chat/chat_event.dart';
+import '../../Notification/notification_bloc.dart';
 import '../../components/colors.dart';
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -231,7 +234,8 @@ class _LoginViewState extends State<LoginView> {
                       backgroundColor: AppColors.tertiaryColor,
                       textColor: AppColors.backgroundColor,
                       fontSize: 16.0);
-                      context.read<ChatBloc>().add(UserLoggedIn());
+                      context.read<ChatBloc>().add(ChatUserLoggedIn());
+                      context.read<NotificationBloc>().add(NotificationUserLoggedIn());
                       Future.delayed(const Duration(seconds: 1),(){
                     Navigator.push(
                       context,

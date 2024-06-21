@@ -12,7 +12,7 @@ import 'package:tuple/tuple.dart';
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository chatRepo;
   IO.Socket socket = IO.io(
-      'http://localhost:3000',
+      'http://10.0.2.2:3000',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -24,14 +24,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     socket.on('receive:message', _onSocketReceiveMessage);
     socket.on('receive:media_message', _onReceiveMediaMessage);
 
-    on<UserLoggedIn>(_onUserLoggedIn);
+    on<ChatUserLoggedIn>(_onUserLoggedIn);
     on<SendMessage>(_onSendMessage);
     on<SendMediaMessage>(_onSendMediaMessage);
     on<ReceiveMessage>(_onReceiveMessage);
   }
 
   Future<void> _onUserLoggedIn(
-      UserLoggedIn event, Emitter<ChatState> emit) async {
+      ChatUserLoggedIn event, Emitter<ChatState> emit) async {
     const storage = FlutterSecureStorage();
     final token = await storage.read(key: 'jwtToken');
 

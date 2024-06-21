@@ -108,7 +108,7 @@ class _ProfileViewState extends State<ProfileView> {
                 backgroundImage: _profileImageUrl != null &&
                         _profileImageUrl!.isNotEmpty
                     ? NetworkImage(
-                        'http://localhost:3000/media?media_id=$_profileImageUrl')
+                        'http://10.0.2.2:3000/media?media_id=$_profileImageUrl')
                     : const AssetImage('image/logo.png') as ImageProvider,
               ),
             ),
@@ -381,9 +381,9 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
               username: post['user_name'] ?? '',
               userImage: post['profileImage'] ?? '',
               postImageOne:
-                  'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+                  'http://10.0.2.2:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
               postImageTwo:
-                  'http://localhost:3000/media?media_id=${post['reference_photo']}',
+                  'http://10.0.2.2:3000/media?media_id=${post['reference_photo']}',
               status: post['artist_post'] == false
                   ? 'Looking for artist'
                   : 'Upcycled by Me',
@@ -483,7 +483,7 @@ class PostWidget extends StatelessWidget {
                   ClipOval(
                     child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                            'http://localhost:3000/media?media_id=$userImage',
+                            'http://10.0.2.2:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,

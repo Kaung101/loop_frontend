@@ -1,6 +1,6 @@
 abstract class ChatEvent {}
 
-class UserLoggedIn extends ChatEvent {}
+class ChatUserLoggedIn extends ChatEvent {}
 
 class SendMessage extends ChatEvent {
   final String content;
