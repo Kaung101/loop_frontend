@@ -117,7 +117,7 @@ Future<void> main() async {
         BlocProvider<CreatePostBloc>(
             create: (_) => CreatePostBloc(postRepo: postRepository)),
         BlocProvider<ChatBloc>(
-            create: (_) => ChatBloc(chatRepo: chatRepository)),
+            create: (_) => ChatBloc(chatRepository: chatRepository)),
         BlocProvider<NotificationBloc>(
             create: (_) =>
                 NotificationBloc(notificationRepo: notificationRepository))

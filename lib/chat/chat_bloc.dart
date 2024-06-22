@@ -10,7 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:tuple/tuple.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  final ChatRepository chatRepo;
+  final ChatRepository chatRepository;
   IO.Socket socket = IO.io(
       'http://10.0.2.2:3000',
       IO.OptionBuilder()
@@ -18,7 +18,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           .disableAutoConnect()
           .build());
 
-  ChatBloc({required this.chatRepo}) : super(const ChatState()) {
+  ChatBloc({required this.chatRepository}) : super(const ChatState()) {
     socket.onConnect(_onConnect);
 
     socket.on('receive:message', _onSocketReceiveMessage);
@@ -28,6 +28,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SendMessage>(_onSendMessage);
     on<SendMediaMessage>(_onSendMediaMessage);
     on<ReceiveMessage>(_onReceiveMessage);
+    on<ReadyToFetchContacts>(_onReadyToFetchContacts);
+  }
+
+  Future<void> _onReadyToFetchContacts(
+      ReadyToFetchContacts event, Emitter<ChatState> emit) async {
+    final contacts = await chatRepository.fetchContacts();
+    emit(state.copyWith(contacts: contacts));
   }
 
   Future<void> _onUserLoggedIn(
@@ -67,9 +74,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     messagesOfUser!.add(messageToAdd);
 
-    emit(state.copyWith(
-      messages: originalMessages,
-    ));
+    if (!state.contacts.contains(key)) {
+      emit(state.copyWith(
+        messages: originalMessages,
+        contacts: [...state.contacts, key],
+      ));
+    } else {
+      emit(state.copyWith(
+        messages: originalMessages,
+      ));
+    }
   }
 
   void _onSocketReceiveMessage(data) {
@@ -92,8 +106,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     final messagesOfUser = originalMessages[key];
     final messageToAdd = Message(
-        from: '', // server will read jwt token and add the info
-        fromUser: '', // server will read jwt token and add the info
+        from: '',
+        // server will read jwt token and add the info
+        fromUser: '',
+        // server will read jwt token and add the info
         to: event.to,
         content: event.content,
         mimetype: '',
@@ -121,8 +137,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     final messagesOfUser = originalMessages[key];
     final messageToAdd = Message(
-        from: '', // server will read jwt token and add the info
-        fromUser: '', // server will read jwt token and add the info
+        from: '',
+        // server will read jwt token and add the info
+        fromUser: '',
+        // server will read jwt token and add the info
         to: event.to,
         content: event.content,
         mimetype: event.mimetype,

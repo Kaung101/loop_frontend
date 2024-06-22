@@ -236,6 +236,7 @@ class _LoginViewState extends State<LoginView> {
                       fontSize: 16.0);
                       context.read<ChatBloc>().add(ChatUserLoggedIn());
                       context.read<NotificationBloc>().add(NotificationUserLoggedIn());
+                      context.read<ChatBloc>().add(ReadyToFetchContacts());
                       Future.delayed(const Duration(seconds: 1),(){
                     Navigator.push(
                       context,
