@@ -192,8 +192,14 @@ class _ProfileViewState extends State<ProfileView> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () async {
-                      // Handle account deletion
+                    onPressed: () async {try {
+                await AuthRepository().deleteAccount(userId);
+                Navigator.of(context).pop(); // Close the dialog
+                // Log out user and redirect to login page or home page
+              } catch (e) {
+                print("Error deleting account: $e");
+                // Optionally show an error message to the user
+              }
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryColor),
@@ -523,12 +529,12 @@ void _showDeletePostDialog(BuildContext context) {
                        ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Post deleted successfully'),)                
                        );
-                       Navigator.of(context, 
-                       rootNavigator: true).pushReplacement(
-                         MaterialPageRoute(
-                           builder: (context) => const ProfileView(),
-                         ),
-                       );
+                      //  Navigator.of(context, 
+                      //  ).pushReplacement(
+                      //    MaterialPageRoute(
+                      //      builder: (context) => const ProfileView(),
+                      //    ),
+                      //  );
 
                        
 
