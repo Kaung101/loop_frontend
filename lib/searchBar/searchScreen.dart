@@ -14,6 +14,7 @@ class searchScreen extends StatefulWidget {
 
 class _searchScreenState extends State<searchScreen> {
 
+
   TextEditingController searchController = TextEditingController();
   int selectIndex = 0;
   String searchQuery = '';
@@ -39,6 +40,7 @@ class _searchScreenState extends State<searchScreen> {
               child: SizedBox(
                 height: 64,
                 child: TextField(
+                  autofocus: true,
 
             decoration: InputDecoration(
               hintText: 'Search',

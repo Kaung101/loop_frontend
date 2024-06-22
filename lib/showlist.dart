@@ -452,46 +452,59 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.backgroundColor,
         title: Container(
           margin: const EdgeInsets.only(top: 1.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search',
-              suffixIcon: Container(
-                margin: const EdgeInsets.only(right: 10.0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
-                    elevation: MaterialStateProperty.all(0),
-                  ),
-                  onPressed: () {
-
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const searchScreen(),
-                                  settings: const RouteSettings(name: '/changePw'),
-                                ),
-                              );
-                  },
-                  child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
+          child: GestureDetector(
+            onTap: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const searchScreen(),
+                  //settings: const RouteSettings(name: '/changePw'),
                 ),
+              );
+            },
+            child: AbsorbPointer(
+              absorbing: true,
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  suffixIcon: Container(
+                    margin: const EdgeInsets.only(right: 10.0),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
+                        elevation: MaterialStateProperty.all(0),
+                      ),
+                      onPressed: () {
+              
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => const searchScreen(),
+                                      settings: const RouteSettings(name: '/changePw'),
+                                    ),
+                                  );
+                      },
+                      child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: AppColors.textColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: AppColors.textColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: const BorderSide(color: AppColors.textColor),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.backgroundColor,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 18.0),
+                ),
+                style: const TextStyle(color: AppColors.textColor),
+                cursorColor: AppColors.textColor,
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.textColor),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.textColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.textColor),
-              ),
-              filled: true,
-              fillColor: AppColors.backgroundColor,
-              contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 18.0),
             ),
-            style: const TextStyle(color: AppColors.textColor),
-            cursorColor: AppColors.textColor,
           ),
         ),
       ),
