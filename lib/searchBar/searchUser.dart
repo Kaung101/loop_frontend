@@ -24,7 +24,7 @@ class _searchUserState extends State<searchUser> {
 
   /*    Future<List<Map<String, dynamic>>> getAllUsers(String searchQuery) async {
     try {
-      return await authRepository.fetchUsers( 'http://localhost:3000',  searchQuery: searchQuery);
+      return await authRepository.fetchUsers( 'http://10.0.2.2:3000',  searchQuery: searchQuery);
     } catch (e) {
       print('Error fetching users: $e');
       return [];
@@ -51,7 +51,6 @@ class _searchUserState extends State<searchUser> {
 
   Future<List<Map<String, dynamic>>> getAllUsers(String searchQuery) async {
     final searchCardList = await authRepository.fetchUsers(searchQuery);
-    print(searchCardList);
     try {
       return searchCardList.map((card) => {
         'username': card['username'] ?? '', 
@@ -185,17 +184,17 @@ class searchCard extends StatelessWidget{
                       builder: (context) => ownUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
                       settings: ownUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
                   ));
-                  }, 
+                  },
                   child: Text(
                     username,
                     style: const TextStyle(
-                      fontSize: 16, 
+                      fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textColor
                       ),
                   )
                   )
-            
+
               ],
             ),
           ),

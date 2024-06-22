@@ -14,7 +14,7 @@ class ChatView extends StatefulWidget {
 
 class _CreateChatViewState extends State<ChatView> {
   List<Widget> _listTileBuilder(ChatState state) {
-    return List.from(state.messages.keys.map(
+    return List.from(state.contacts.map(
       (userId) => ListTile(
           title: Text(userId.item2),
           leading: CircleAvatar(

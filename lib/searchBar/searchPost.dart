@@ -35,10 +35,10 @@ class _SearchPostState extends State<SearchPost> {
     try {
       return postCardList.map((card) => {
         'userId': card['user'] ?? '',
-        'username': card['user_name'] ?? '', 
+        'username': card['user_name'] ?? '',
         'userImage': card['profileImage'] ?? '',
-        'postImageOne': 'http://10.0.2.2:3000/media?media_id=${card['original_photo'] ?? ''}', 
-        'postImageTwo': 'http://10.0.2.2:3000/media?media_id=${card['reference_photo'] ?? ''}',        
+        'postImageOne': 'http://10.0.2.2:3000/media?media_id=${card['original_photo'] ?? ''}',
+        'postImageTwo': 'http://10.0.2.2:3000/media?media_id=${card['reference_photo'] ?? ''}',
         'status': card['artist_post'] ? "Upcycled by me" : "Looking for artist",
         'productName': card['name'] ?? '',
         'productPrice': card['price'] ?? '',
@@ -76,7 +76,7 @@ class _SearchPostState extends State<SearchPost> {
               ); */
               return PostWidget(
                 userId: snapshot.data![index]['userId'] ?? '',
-                username: snapshot.data![index]['username'] ?? '', 
+                username: snapshot.data![index]['username'] ?? '',
                 userImage: snapshot.data![index]['userImage'] ?? '', 
                 postImageOne: snapshot.data![index] ['postImageOne'] ?? '', 
                 postImageTwo: snapshot.data![index]['postImageTwo'] ?? '', 
@@ -187,7 +187,7 @@ class PostWidget extends StatelessWidget {
                       ),
                     ),
                       )
-                
+
                   ],
                 ),
               ),

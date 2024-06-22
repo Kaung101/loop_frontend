@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         elevation: MaterialStateProperty.all(0),
                       ),
                       onPressed: () {
-              
+
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => const searchScreen(),
@@ -199,7 +199,7 @@ class PostWidget extends StatelessWidget {
                     ClipOval(
                       child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                           'http://10.0.2.2:3000/media?media_id=$userImage',
+                           'http://localhost:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,

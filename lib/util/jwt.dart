@@ -14,4 +14,3 @@ Future<String> getUsername() async {
 
   return tokenBody['username'];
 }
-

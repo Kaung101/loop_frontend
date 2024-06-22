@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:loop/chat/chat_state.dart';
+import 'package:loop/util/env.dart';
 
 class Triangle extends CustomPainter {
   final Color bgColor;
@@ -24,9 +28,14 @@ class Triangle extends CustomPainter {
 
 class ReceivedMessageBubble extends StatelessWidget {
   final String message;
+  final MessageType type;
+  final String media;
+
   const ReceivedMessageBubble({
     super.key,
     required this.message,
+    required this.type,
+    required this.media,
   });
 
   @override
@@ -44,22 +53,26 @@ class ReceivedMessageBubble extends StatelessWidget {
         //   ),
         // ),
         Flexible(
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(18),
-                bottomLeft: Radius.circular(18),
-                bottomRight: Radius.circular(18),
-              ),
-            ),
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.black, fontSize: 14),
-            ),
-          ),
-        ),
+            child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(18),
+                    bottomLeft: Radius.circular(18),
+                    bottomRight: Radius.circular(18),
+                  ),
+                ),
+                child: type == MessageType.text
+                    ? Text(
+                        message,
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 14),
+                      )
+                    : Image.network(
+                        '${AppEnv.getBaseUrl()}/media?media_id=$message',
+                        width: 150,
+                      )))
       ],
     ));
 
