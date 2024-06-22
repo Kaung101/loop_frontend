@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loop/chat/chat_repo.dart';
 import 'package:loop/chat/chat_event.dart';
 import 'package:loop/chat/chat_state.dart';
@@ -22,13 +23,30 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     socket.onConnect(_onConnect);
 
     socket.on('receive:message', _onSocketReceiveMessage);
-    socket.on('receive:media_message', _onReceiveMediaMessage);
+    socket.on('receive:media_message', _onSocketReceiveMediaMessage);
 
     on<ChatUserLoggedIn>(_onUserLoggedIn);
     on<SendMessage>(_onSendMessage);
     on<SendMediaMessage>(_onSendMediaMessage);
     on<ReceiveMessage>(_onReceiveMessage);
+    on<ReceiveMediaMessage>(_onReceiveMediaMessage);
     on<ReadyToFetchContacts>(_onReadyToFetchContacts);
+    on<FetchChatHistory>(_onFetchChatHistory);
+  }
+
+  Future<void> _onFetchChatHistory(
+      FetchChatHistory event, Emitter<ChatState> emit) async {
+    final messages = await chatRepository.fetchChatHistory(event.userId);
+    final key = Tuple2<String, String>(event.userId, event.userName);
+    Map<Tuple2<String, String>, List<Message>> originalMessages =
+        Map.from(state.chatHistory);
+    if (!originalMessages.containsKey(key)) {
+      List<Message> emptyList = [];
+      originalMessages.addEntries([MapEntry(key, emptyList)]);
+    }
+    final messagesOfUser = originalMessages[key];
+    messagesOfUser!.addAll(messages);
+    emit(state.copyWith(chatHistory: originalMessages));
   }
 
   Future<void> _onReadyToFetchContacts(
@@ -48,7 +66,41 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   void _onConnect(data) {}
 
-  void _onReceiveMediaMessage(data) {}
+  Future<void> _onReceiveMediaMessage(
+      ReceiveMediaMessage event, Emitter<ChatState> emit) async {
+    Map<Tuple2<String, String>, List<Message>> originalMessages =
+        Map.from(state.messages);
+    final key = Tuple2<String, String>(event.from, event.fromUser);
+    if (!originalMessages.containsKey(key)) {
+      List<Message> emptyList = [];
+      originalMessages.addEntries([
+        MapEntry(Tuple2.fromList([event.from, event.fromUser]), emptyList)
+      ]);
+    }
+
+    final messagesOfUser =
+        originalMessages[Tuple2.fromList([event.from, event.fromUser])];
+    final messageToAdd = Message(
+        to: await getUserId(),
+        from: event.from,
+        fromUser: event.fromUser,
+        content: event.content,
+        mimetype: '',
+        type: MessageType.values.byName(event.type));
+
+    messagesOfUser!.add(messageToAdd);
+
+    if (!state.contacts.contains(key)) {
+      emit(state.copyWith(
+        messages: originalMessages,
+        contacts: [...state.contacts, key],
+      ));
+    } else {
+      emit(state.copyWith(
+        messages: originalMessages,
+      ));
+    }
+  }
 
   Future<void> _onReceiveMessage(
       ReceiveMessage event, Emitter<ChatState> emit) async {
@@ -70,7 +122,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         fromUser: event.fromUser,
         content: event.content,
         mimetype: '',
-        type: MessageType.text);
+        type: MessageType.values.byName(event.type));
 
     messagesOfUser!.add(messageToAdd);
 
@@ -88,9 +140,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   void _onSocketReceiveMessage(data) {
     add(ReceiveMessage(
-        content: data['content'],
-        from: data['from'],
-        fromUser: data['from_user']));
+      content: data['content'],
+      from: data['from'],
+      fromUser: data['from_user'],
+      type: data['type'],
+    ));
+  }
+
+  void _onSocketReceiveMediaMessage(data) {
+    add(ReceiveMediaMessage(
+      content: data['content'],
+      from: data['from'],
+      fromUser: data['from_user'],
+      type: data['type'],
+    ));
   }
 
   Future<void> _onSendMessage(

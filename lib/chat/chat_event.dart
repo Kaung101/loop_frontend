@@ -29,7 +29,31 @@ class ReceiveMessage extends ChatEvent {
   final String content;
   final String from;
   final String fromUser;
+  final String type;
 
   ReceiveMessage(
-      {required this.content, required this.from, required this.fromUser});
+      {required this.content,
+      required this.from,
+      required this.fromUser,
+      required this.type});
+}
+
+class ReceiveMediaMessage extends ChatEvent {
+  final String content;
+  final String from;
+  final String fromUser;
+  final String type;
+
+  ReceiveMediaMessage(
+      {required this.content,
+      required this.from,
+      required this.fromUser,
+      required this.type});
+}
+
+class FetchChatHistory extends ChatEvent {
+  final String userId;
+  final String userName;
+
+  FetchChatHistory({required this.userId, required this.userName});
 }

@@ -28,6 +28,8 @@ class _DirectMessageViewState extends State<DirectMessageView> {
   final TextEditingController _chatInputController = TextEditingController();
   Uint8List? _pickedFile;
   XFile? picked;
+  final OverlayPortalController _overlayController = OverlayPortalController();
+
   final _buttonStyle = ButtonStyle(
     overlayColor: MaterialStateProperty.resolveWith<Color?>(
       (Set<MaterialState> states) {
@@ -43,14 +45,54 @@ class _DirectMessageViewState extends State<DirectMessageView> {
     ),
   );
 
-  List<Widget> _buildMessage(ChatState state) {
-    return List.from(state.messages[widget.userId]!.map((message) {
+  List<Widget> _buildHistory(ChatState state) {
+    if (state.chatHistory[widget.userId] == null) {
+      return List.from([]);
+    }
+
+    return List.from(state.chatHistory[widget.userId]!.map((message) {
       if (message.from == widget.userId.item1) {
-        return ReceivedMessageBubble(message: message.content);
+        return ReceivedMessageBubble(
+            message: message.type == MessageType.text
+                ? message.content
+                : message.media!,
+            type: message.type,
+            media: message.media!);
       } else {
-        return SentMessageBubble(message: message.content, type: message.type);
+        return SentMessageBubble(
+            message: message.content,
+            type: message.type,
+            media: message.media!);
       }
     }));
+  }
+
+  List<Widget> _buildMessage(ChatState state) {
+    if (state.messages[widget.userId] == null) {
+      return List.from([]);
+    }
+
+    return List.from(state.messages[widget.userId]!.map((message) {
+      if (message.from == widget.userId.item1) {
+        return ReceivedMessageBubble(
+            message: message.content,
+            type: message.type,
+            media: message.media ?? '');
+      } else {
+        return SentMessageBubble(
+            message: message.content,
+            type: message.type,
+            media: message.media ?? '');
+      }
+    }));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<ChatBloc>().add(FetchChatHistory(
+        userId: widget.userId.item1, userName: widget.userId.item2));
   }
 
   @override
@@ -85,12 +127,15 @@ class _DirectMessageViewState extends State<DirectMessageView> {
         ),
       ),
       body: BlocBuilder<ChatBloc, ChatState>(builder: (context, state) {
-        OverlayPortalController _overlayController = OverlayPortalController();
         return Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Expanded(child: ListView(children: _buildMessage(state))),
+                Expanded(
+                    child: ListView(children: [
+                  ..._buildHistory(state),
+                  ..._buildMessage(state)
+                ])),
                 Row(children: [
                   Expanded(
                       child: TextField(
