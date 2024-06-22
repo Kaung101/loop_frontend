@@ -51,8 +51,8 @@ class _SearchPostState extends State<SearchPost> {
           return ListView.builder(
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
-              print('search post');
-              print(snapshot.data![index]);
+              /* print('search post');
+              print(snapshot.data![index]); */
 
               /* final post = snapshot.data![index];
               return ListTile(

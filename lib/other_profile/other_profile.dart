@@ -10,7 +10,6 @@ class OtherProfile extends StatefulWidget {
 
   final String userId;
   
-
   OtherProfile({super.key, required this.userId});
 
   @override
