@@ -10,7 +10,7 @@ import 'package:loop/user_management/view_profile.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 class AuthRepository {
-  final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:3000');
+  final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:3000');
   final storage = const  FlutterSecureStorage();
   Future<String> login({required String email, required String password}) async {
     

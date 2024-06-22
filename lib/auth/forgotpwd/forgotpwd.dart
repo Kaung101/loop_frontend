@@ -81,7 +81,7 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
     final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
     final response = await http.post(url,
         headers: {
-          'origin': 'http://localhost',
+          'origin': 'http://10.0.2.2',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -303,7 +303,7 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
                   color: AppColors.textColor,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
               SingleChildScrollView(
                 child: Visibility(
                   visible: showEmailField,
@@ -335,7 +335,7 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
                       SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.only(
-                              left: 8, right: 8, bottom: 5),
+                              left: 0, right: 0, bottom: 5),
                           child: TextFormField(
                             controller: _emailController,
                             validator: (value) {

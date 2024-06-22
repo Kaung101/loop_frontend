@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,7 +110,7 @@ class _ProfileViewState extends State<ProfileView> {
                 backgroundImage: _profileImageUrl != null &&
                         _profileImageUrl!.isNotEmpty
                     ? NetworkImage(
-                        'http://localhost:3000/media?media_id=$_profileImageUrl')
+                        'http://10.0.2.2:3000/media?media_id=$_profileImageUrl')
                     : const AssetImage('image/logo.png') as ImageProvider,
               ),
             ),
@@ -231,7 +233,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _editProfileSection() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20),
       child: SizedBox(
         child: Container(
           padding: const EdgeInsets.all(20),
@@ -384,12 +386,13 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
     return postList
         .map((post) => PostWidget(
               postId: post['_id'] ?? '',
+              showOnFeed: post['show_post'] ?? '',
               username: post['user_name'] ?? '',
               userImage: post['profileImage'] ?? '',
               postImageOne:
-                  'http://localhost:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+                  'http://10.0.2.2:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
               postImageTwo:
-                  'http://localhost:3000/media?media_id=${post['reference_photo']}',
+                  'http://10.0.2.2:3000/media?media_id=${post['reference_photo']}',
               status: post['artist_post'] == false
                   ? 'Looking for artist'
                   : 'Upcycled by Me',
@@ -435,7 +438,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
 
 class PostWidget extends StatelessWidget {
   final String postId;
-  //final String userId;
+  final bool showOnFeed;
   final String username;
   final String userImage;
   final String postImageOne;
@@ -448,7 +451,7 @@ class PostWidget extends StatelessWidget {
   const PostWidget({
     super.key,
     required this.postId,
-    // required this.userId,
+    required this.showOnFeed,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -574,7 +577,7 @@ void _showDeletePostDialog(BuildContext context) {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
       child: Card(
         color: AppColors.backgroundColor,
         shape: RoundedRectangleBorder(
@@ -584,24 +587,24 @@ void _showDeletePostDialog(BuildContext context) {
               width: 1.0), // Set border color and width
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 5),
                   ClipOval(
                     child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                            'http://localhost:3000/media?media_id=$userImage',
+                            'http://10.0.2.2:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
                           )
                         : Image.asset('image/logo.png', width: 60, height: 60),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width:2),
                   TextButton(
                     style: ButtonStyle(
                       overlayColor: MaterialStateProperty.resolveWith<Color?>(
@@ -626,8 +629,8 @@ void _showDeletePostDialog(BuildContext context) {
                           color: AppColors.textColor),
                     ),
                   ),
-                  const Spacer(),
-                  DropDown(postId: postId),
+                  //const Spacer(),
+                  DropDown(postId: postId, showOnFeed: showOnFeed),
                   IconButton(
                     icon: const Icon(CupertinoIcons.delete),
                     onPressed: () => _showDeletePostDialog(context),
@@ -830,13 +833,19 @@ void _showDeletePostDialog(BuildContext context) {
 
 class DropDown extends StatefulWidget {
   final String postId;
-  const DropDown({super.key, required this.postId});
+  final bool showOnFeed;
+  const DropDown({super.key, required this.postId , required this.showOnFeed});
   @override
   DropDownState createState() => DropDownState();
 }
 
 class DropDownState extends State<DropDown> {
-  String dropdownValue = 'Show Post';
+  late String dropdownValue;
+  @override
+  void initState() {
+    super.initState();
+    dropdownValue = widget.showOnFeed == true ? 'Show Post' : 'Hide from Feed';
+  }
   final List<String> _items = [
     'Show Post',
     'Hide from Feed',
