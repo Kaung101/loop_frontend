@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
-import 'package:loop/components/colors.dart'; // Update with your actual import path
+import 'package:loop/components/colors.dart';
+import 'package:loop/components/editProfileNav.dart';
+import 'package:loop/other_profile/other_profile.dart'; // Update with your actual import path
 
 class SearchPost extends StatefulWidget {
   final String searchQuery;
@@ -14,6 +16,17 @@ class SearchPost extends StatefulWidget {
 
 class _SearchPostState extends State<SearchPost> {
   final AuthRepository authRepository = AuthRepository();
+  String? ownerUserId;
+
+  @override
+  void initState() {
+    super.initState();
+    authRepository.fetchUserData().then((value) {
+      setState(() {
+        ownerUserId = value?['user']['_id'];
+      });
+    });
+  }
 
   Future<List<Map<String, dynamic>>> getAllPosts(String searchQuery) async {
     final postCardList = await authRepository.fetchPosts(searchQuery);
@@ -21,6 +34,7 @@ class _SearchPostState extends State<SearchPost> {
     print('PostCardList');
     try {
       return postCardList.map((card) => {
+        'userId': card['user'] ?? '',
         'username': card['user_name'] ?? '', 
         'userImage': card['profileImage'] ?? '',
         'postImageOne': 'http://10.0.2.2:3000/media?media_id=${card['original_photo'] ?? ''}', 
@@ -29,6 +43,7 @@ class _SearchPostState extends State<SearchPost> {
         'productName': card['name'] ?? '',
         'productPrice': card['price'] ?? '',
         'description': card['description'] ?? '',
+        'ownerUserId': ownerUserId ?? '',
       }).toList();
     } catch (e) {
       print('Error fetching posts: $e');
@@ -60,6 +75,7 @@ class _SearchPostState extends State<SearchPost> {
                 subtitle: Text(post['content']),
               ); */
               return PostWidget(
+                userId: snapshot.data![index]['userId'] ?? '',
                 username: snapshot.data![index]['username'] ?? '', 
                 userImage: snapshot.data![index]['userImage'] ?? '', 
                 postImageOne: snapshot.data![index] ['postImageOne'] ?? '', 
@@ -68,6 +84,7 @@ class _SearchPostState extends State<SearchPost> {
                 productName: snapshot.data![index]['productName'] ?? '', 
                 productPrice: snapshot.data![index]['productPrice'] ?? '', 
                 description: snapshot.data![index]['description'] ?? '',
+                ownerUserId: snapshot.data![index]['ownerUserId'] ?? '',
           );
           },
           );
@@ -79,7 +96,7 @@ class _SearchPostState extends State<SearchPost> {
 
 class PostWidget extends StatelessWidget {
   //final String postId;
-  //final String userId;
+  final String userId;
   final String username;
   final String userImage;
   final String postImageOne;
@@ -88,11 +105,12 @@ class PostWidget extends StatelessWidget {
   final String productName;
   final String productPrice;
   final String description;
+  final String ownerUserId;
 
   const PostWidget({
     super.key, 
     //required this.postId,
-   // required this.userId,
+   required this.userId,
     required this.username,
     required this.userImage,
     required this.postImageOne,
@@ -101,6 +119,7 @@ class PostWidget extends StatelessWidget {
     required this.productName,
     required this.productPrice,
     required this.description,
+    required this.ownerUserId,
   });
 
   @override
@@ -117,47 +136,60 @@ class PostWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  ClipOval(
-                      child: userImage != 'null' && userImage.isNotEmpty
-                        ? Image.network(
-                           'http://10.0.2.2:3000/media?media_id=$userImage',
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset('image/logo.png', width: 60, height: 60),
+              InkWell(
+                onTap:(){
+                   Navigator.push(
+                    context, MaterialPageRoute(
+                      builder: (context) => ownerUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
+                      settings: ownerUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                  ));
+                },
+                child: Row(
+                  children: [
+                    ClipOval(
+                        child: userImage != 'null' && userImage.isNotEmpty
+                          ? Image.network(
+                             'http://10.0.2.2:3000/media?media_id=$userImage',
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset('image/logo.png', width: 60, height: 60),
+                      ),
+                    const SizedBox(width: 5),
+                    TextButton(
+                    style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.transparent;
+                        }
+                        if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
+                          return Colors.transparent;
+                        }
+                        return null; // Defer to the widget's default.
+                      },
                     ),
-                  const SizedBox(width: 5),
-                  TextButton(
-                  style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.hovered)) {
-                        return Colors.transparent;
-                      }
-                      if (states.contains(MaterialState.focused) || states.contains(MaterialState.pressed)) {
-                        return Colors.transparent;
-                      }
-                      return null; // Defer to the widget's default.
-                    },
                   ),
+                      onPressed: (){
+                        Navigator.push(
+                        context, MaterialPageRoute(
+                          builder: (context) => ownerUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
+                          settings: ownerUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                      ));
+                      },
+                       child: Text(
+                      username,
+                      style:const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.textColor
+                      ),
+                    ),
+                      )
+                
+                  ],
                 ),
-                    onPressed: (){
-
-                    },
-                     child: Text(
-                    username,
-                    style:const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w300,
-                      color: AppColors.textColor
-                    ),
-                  ),
-                    )
-
-                ],
               ),
               SizedBox(height: 16),
               Row(

@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/components/colors.dart';
+import 'package:loop/components/editProfileNav.dart';
+import 'package:loop/other_profile/other_profile.dart';
 
 class searchUser extends StatefulWidget {
-  //const searchList({super.key});
-    //const searchList({super.key, required this.searchQuery});
     const searchUser({Key? key, required this.searchQuery})
       : super(key: key);
           
@@ -19,6 +19,7 @@ class searchUser extends StatefulWidget {
 class _searchUserState extends State<searchUser> {
 
     final AuthRepository authRepository = AuthRepository();
+    String? ownerUserId;
     //late String searchQuery = ''; // Define the searchQuery state variable
 
   /*    Future<List<Map<String, dynamic>>> getAllUsers(String searchQuery) async {
@@ -38,13 +39,24 @@ class _searchUserState extends State<searchUser> {
       return [];
     }
   } */
+ @override
+  void initState() {
+    super.initState();
+    authRepository.fetchUserData().then((value) {
+      setState(() {
+        ownerUserId = value?['user']['_id'];
+      });
+    });
+  }
 
   Future<List<Map<String, dynamic>>> getAllUsers(String searchQuery) async {
     final searchCardList = await authRepository.fetchUsers(searchQuery);
+    print(searchCardList);
     try {
       return searchCardList.map((card) => {
         'username': card['username'] ?? '', 
-        'userImage': card['profileImage'] ?? ''
+        'userImage': card['profileImage'] ?? '',
+        'userId': card['_id'] ?? '',
       }).toList();
     } catch (e) {
       print('Error fetching users: $e');
@@ -73,6 +85,8 @@ class _searchUserState extends State<searchUser> {
               return searchCard(
                 username: snapshot.data![index]['username'] ?? '',
                 userImage: snapshot.data![index]['userImage'] ?? '',
+                userId: snapshot.data![index]['userId'] ?? '',
+                ownUserId: ownerUserId ?? '',
               );
               /* final user = snapshot.data![index];
               print('snap shot data');
@@ -120,11 +134,15 @@ class _searchUserState extends State<searchUser> {
 class searchCard extends StatelessWidget{
   final String username;
   final String userImage;
+  final String userId;
+  final String ownUserId;
 
   const searchCard({
     super.key,
     required this.username,
     required this.userImage,
+    required this.userId,
+    required this.ownUserId,
   });
 
   @override
@@ -132,36 +150,55 @@ class searchCard extends StatelessWidget{
     return Container(
       padding: const EdgeInsets.only(left: 12),
       width: MediaQuery.of(context).size.width * 0.2,
-      child: Row(
+      child: Column(
         children: [
-          ClipOval(
-            child: userImage != 'null' && userImage.isNotEmpty
-            ? Image.network(
-              'http://10.0.2.2:3000/media?media_id=$userImage',
-              width: 64,
-              height: 64,
-              fit: BoxFit.cover,
-            ): Image.asset('image/logo.png',
-            width: 60,
-            height: 60),
-          ),
-          /* CircleAvatar(
-            radius: 32,
-            backgroundImage: NetworkImage(userImage),
-          ), */
-          const SizedBox(width: 1),
-          TextButton(
-            onPressed: (){}, 
-            child: Text(
-              username,
-              style: const TextStyle(
-                fontSize: 16, 
-                fontWeight: FontWeight.w800,
-                color: AppColors.textColor
+          InkWell(
+            onTap: (){
+              Navigator.push(
+                    context, MaterialPageRoute(
+                      builder: (context) => ownUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
+                      settings: ownUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                  ));
+            },
+            child: Row(
+              children: [
+                ClipOval(
+                  child: userImage != 'null' && userImage.isNotEmpty
+                  ? Image.network(
+                    'http://10.0.2.2:3000/media?media_id=$userImage',
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                  ): Image.asset('image/logo.png',
+                  width: 60,
+                  height: 60),
                 ),
-            )
-            )
-
+                /* CircleAvatar(
+                  radius: 32,
+                  backgroundImage: NetworkImage(userImage),
+                ), */
+                const SizedBox(width: 1),
+                TextButton(
+                  onPressed: (){
+                    Navigator.push(
+                    context, MaterialPageRoute(
+                      builder: (context) => ownUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
+                      settings: ownUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                  ));
+                  }, 
+                  child: Text(
+                    username,
+                    style: const TextStyle(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textColor
+                      ),
+                  )
+                  )
+            
+              ],
+            ),
+          ),
         ],
       ),
     );

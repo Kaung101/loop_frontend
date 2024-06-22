@@ -92,8 +92,10 @@ class _CreatePostState extends State<CreatePost> {
       return SingleChildScrollView(
         child: TextFormField(
           decoration: InputDecoration(
+              label: const Text("100-200", style: TextStyle(color: Colors.grey),),
               fillColor: AppColors.backgroundColor,
               filled: true,
+              floatingLabelBehavior: FloatingLabelBehavior.never,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               )),
