@@ -457,7 +457,24 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
     
   }
 
+   Future<void> deleteAccount(String ? userId) async {
+  final token = await storage.read(key: 'jwtToken');
+  if (token == null) throw Exception('User not logged in');
+
+  final response = await http.delete(
+    Uri.parse('$baseUrl/api/auth/deleteAccount/$userId'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode != 204) {
+    throw Exception('Failed to delete account');
+  }
 }
+}
+
 
 
 /* Future<bool> changePassword( String currentPassword, String newPassword) async {

@@ -137,7 +137,7 @@ class searchCard extends StatelessWidget{
           ClipOval(
             child: userImage != 'null' && userImage.isNotEmpty
             ? Image.network(
-              'http://localhost:3000/media?media_id=$userImage',
+              'http://10.0.2.2:3000/media?media_id=$userImage',
               width: 64,
               height: 64,
               fit: BoxFit.cover,
