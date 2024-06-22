@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loop/chat/chat_bloc.dart';
+import 'package:loop/chat/chat_event.dart';
 import 'package:loop/chat/chat_state.dart';
 import 'package:loop/chat/direct_message_view.dart';
 import 'package:loop/components/colors.dart';
@@ -27,6 +28,13 @@ class _CreateChatViewState extends State<ChatView> {
               MaterialPageRoute(
                   builder: (context) => DirectMessageView(userId: userId)))),
     ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<ChatBloc>().add(ReadyToFetchContacts());
   }
 
   @override
