@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:loop/components/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:loop/auth/auth_repo.dart'; // Adjust the import based on your project structure
 
 class ChangePw extends StatefulWidget {
   const ChangePw({super.key});
@@ -15,6 +17,7 @@ class _ChangePwState extends State<ChangePw> {
   final _formKey = GlobalKey<FormState>();
   String errorMessage = '';
   bool newPasswordError = false;
+  String _emailController = '';
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmNewPasswordController = TextEditingController();
@@ -23,33 +26,53 @@ class _ChangePwState extends State<ChangePw> {
   bool passwordVisibleThree = false;
   final passwordRegex = RegExp(
       r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$");
+  final authRepo = AuthRepository();
 
-    @override
-    void initState() {
+  @override
+  void initState() {
     super.initState();
     passwordVisibleOne = true;
     passwordVisibleTwo = true;
     passwordVisibleThree = true;
+    _fetchUserData();
   }
 
   @override
   void dispose() {
+    //_emailController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmNewPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _updatePassword(String newPassword) async {
+  Future<void> _fetchUserData() async {
+    try {
+      final userData = await authRepo.fetchUserData();
+      setState(() {
+        _emailController = userData?['user']['email'];
+      });
+      //print(_emailController);
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+  Future<void> _updatePassword(String email, String newPassword) async {
     setState(() {
       errorMessage = '';
     });
 
-     /* try {
-      // Verify new password and confirm password match
-      if (newPassword != _newPasswordController.text) {
+    try {
+/*       final authRepo = AuthRepository();
+ */      final success = await authRepo.changePassword(email, _currentPasswordController.text, newPassword);
+        print("$success success");
+         /* final msg = jsonDecode(success);
+         final msgReal = msg['message'];
+      print(msgReal);
+      print('success'); */
+      if (success == 'true') {
         Fluttertoast.showToast(
-          msg: 'New password and confirm password do not match',
+          msg: ' updated successfully',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           webPosition: "center",
@@ -57,32 +80,27 @@ class _ChangePwState extends State<ChangePw> {
           textColor: AppColors.primaryColor,
           fontSize: 16.0,
         );
-        return;
+        //Navigator.pop(context);
+      } else {
+        setState(() {
+          errorMessage = 'Current password is incorrect';
+        });
+        _formKey.currentState!.validate();
       }
-    } on catch (e) {
-      // Handle Firebase authentication errors
-      setState(() {
-        errorMessage = 'Wrong current password. Try again.';
-      });
-      _formKey.currentState!.validate();
     } catch (e) {
-      // Handle other errors
       setState(() {
-        errorMessage = 'Error updating password';
+        errorMessage = 'Type Correct Password';
       });
       _formKey.currentState!.validate();
-    } */
+    }
   }
-
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     const appTitle = "Change Password";
     return MaterialApp(
       title: appTitle,
-      
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.backgroundColor,
-        
       ),
       home: Scaffold(
         appBar: AppBar(
@@ -103,6 +121,48 @@ class _ChangePwState extends State<ChangePw> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      /* const Padding(
+                        padding: EdgeInsets.only(left: 20.0, right: 15.0, top: 10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Username',
+                              style: TextStyle(
+                                color: AppColors.textColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                        child: TextFormField(
+                          controller: _emailController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your username';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            fillColor: Colors.white,
+                            filled: false,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                      ), */
                       const Padding(
                         padding: EdgeInsets.only(left: 20.0, right: 15.0, top: 10.0),
                         child: Column(
@@ -153,12 +213,12 @@ class _ChangePwState extends State<ChangePw> {
                             //fillColor: Colors.white,
                             filled: false,
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: AppColors.textColor,
-                                  width: 2.0,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
                               ),
+                            ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                               borderSide: const BorderSide(color: Colors.red),
@@ -232,12 +292,12 @@ class _ChangePwState extends State<ChangePw> {
                             fillColor: Colors.white,
                             filled: false,
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: AppColors.textColor,
-                                  width: 2.0,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
                               ),
+                            ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                               borderSide: const BorderSide(color: Colors.red),
@@ -289,12 +349,12 @@ class _ChangePwState extends State<ChangePw> {
                             fillColor: Colors.white,
                             filled: false,
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: AppColors.textColor,
-                                  width: 2.0,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: AppColors.textColor,
+                                width: 2.0,
                               ),
+                            ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                               borderSide: const BorderSide(color: Colors.red),
@@ -322,8 +382,7 @@ class _ChangePwState extends State<ChangePw> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          _updatePassword(_newPasswordController.text);
-                        }
+                          _updatePassword(_emailController, _newPasswordController.text);                        }
                       },
                       child: const Text(
                         'Update',

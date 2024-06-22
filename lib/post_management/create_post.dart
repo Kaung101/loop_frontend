@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -25,7 +27,9 @@ class _CreatePostState extends State<CreatePost> {
   final _formKey = GlobalKey<FormState>();
   final PostRepository postRepository = PostRepository();
   bool status = true;
-
+  //photo preview
+  Uint8List? beforePhoto;
+  Uint8List? afterPhoto;
 
   Widget _statusField(){
 
@@ -88,8 +92,10 @@ class _CreatePostState extends State<CreatePost> {
       return SingleChildScrollView(
         child: TextFormField(
           decoration: InputDecoration(
+              label: const Text("100-200", style: TextStyle(color: Colors.grey),),
               fillColor: AppColors.backgroundColor,
               filled: true,
+              floatingLabelBehavior: FloatingLabelBehavior.never,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               )),
@@ -142,9 +148,13 @@ class _CreatePostState extends State<CreatePost> {
               final pickedFile =
                   await imagePicker.pickImage(source: ImageSource.gallery);
               if (pickedFile != null) {
+                final bytes = await pickedFile.readAsBytes();
                 context
                     .read<CreatePostBloc>()
                     .add(BeforePhotoChanged(beforePhoto: pickedFile));
+                setState(() {
+                  beforePhoto = bytes.buffer.asUint8List();
+                });
               }
             },
             label: const Text(
@@ -185,6 +195,10 @@ class _CreatePostState extends State<CreatePost> {
                 context
                     .read<CreatePostBloc>()
                     .add(AfterPhotoChanged(afterPhoto: pickedFile));
+                final bytes = await pickedFile.readAsBytes();
+                setState(() {
+                  afterPhoto = bytes.buffer.asUint8List();
+                });
               }
             },
             label: const Text(
@@ -236,15 +250,23 @@ class _CreatePostState extends State<CreatePost> {
 
                 if (state.errorMessage == '') {
                   Future.delayed(const Duration(seconds: 1), () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RepositoryProvider(
-                          create: (context) => AuthRepository(),
-                          child: const BottomNav(),
-                        ),
-                      ),
-                    );
+                    Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => RepositoryProvider(
+              create: (context) => AuthRepository(),
+              child: const BottomNav(),
+            ),
+          ),
+        );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => RepositoryProvider(
+                    //       create: (context) => AuthRepository(),
+                    //       child: const BottomNav(),
+                    //     ),
+                    //   ),
+                    // );
                   });
                 }
               }
@@ -272,11 +294,14 @@ class _CreatePostState extends State<CreatePost> {
           leading: IconButton(
             icon: const Icon(CupertinoIcons.back, color: AppColors.textColor),
             onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const BottomNav(),
-                ),
-              );
+             Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => RepositoryProvider(
+              create: (context) => AuthRepository(),
+              child: const BottomNav(),
+            ),
+          ),
+        );
             },
           ),
           title: const Align(
@@ -358,6 +383,65 @@ class _CreatePostState extends State<CreatePost> {
                     Row(children: [
                       _beforePhotoButton(),
                     ]),
+                    //photo preview
+                    if (beforePhoto != null)
+                  Row(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Container(
+                                  width: 100,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(7),
+                                    image: DecorationImage(
+                                      image: MemoryImage(beforePhoto!),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 5,
+                                right: 15,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.tertiaryColor,
+                                  ),
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: const Icon(Icons.close,
+                                        size: 16, color: Colors.black),
+                                    onPressed: () {
+                                      setState(() {
+                                        beforePhoto = null;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Add your other widgets here
+                    ],
+                  ),
+                const SizedBox(height: 15),
+                    //photo preview
                     const Padding(
                       padding: EdgeInsets.only(left: 10.0, top: 10),
                       child: Row(
@@ -373,6 +457,65 @@ class _CreatePostState extends State<CreatePost> {
                       ),
                     ),
                     Row(children: [_afterPhotoButton()]),
+                    //photo preview
+                    if (afterPhoto != null)
+                  Row(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 140,
+                          height: 140,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Container(
+                                  width: 100,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(7),
+                                    image: DecorationImage(
+                                      image: MemoryImage(afterPhoto!),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 5,
+                                right: 15,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.tertiaryColor,
+                                  ),
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: const Icon(Icons.close,
+                                        size: 16, color: Colors.black),
+                                    onPressed: () {
+                                      setState(() {
+                                        afterPhoto = null;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Add your other widgets here
+                    ],
+                  ),
+                const SizedBox(height: 15),
+                    //photo preview
                      Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: _postButton(),

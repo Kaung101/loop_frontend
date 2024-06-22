@@ -369,6 +369,38 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
     }
   }
 
+ Future<String> changePassword(String email, String currentPassword, String newPassword) async {
+  try {
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/auth/changePassword'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      }),
+    );
+
+    print('Response Status Code: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+
+
+    if (response.statusCode == 200) {
+      // Password updated successfully
+      return 'true';
+    } else if (response.statusCode == 400) {
+      // Handle specific error cases
+      final error = jsonDecode(response.body)['error'];
+      return error;
+    } else {
+      // Handle other status codes
+      return 'Failed to update password. Status Code: ${response.statusCode}';
+    }
+  } catch (e) {
+    print('Error changing password: $e');
+    return 'Error changing password';
+  }
+ }
  //new condition of own profile all post
  //get other profile post
   Future<List<dynamic>> ownProfilePost({required String userId}) async {
@@ -401,4 +433,87 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
   }  
   return false;
   }
+
+  //delete post
+  Future<void> deletePost(String postId) async {
+    try{
+      final token = await storage.read(key: 'jwtToken');
+      final response = await http.delete(
+        Uri.parse('$baseUrl/post?post_id=$postId'),
+        headers:{
+          'Authorization': 'Bearer $token',
+      },
+        );
+        if(response.statusCode == 204){
+          print('Post deleted successfully');
+    } else {
+      print('Failed to delete post. Status code: ${response.statusCode}');
+      throw Exception('Failed to delete post');
+    }
+    }catch(e){
+      print('Error deleting post: $e');
+      throw Exception('Error deleting post');
+    }
+    
+  }
+
+   Future<void> deleteAccount(String ? userId) async {
+  final token = await storage.read(key: 'jwtToken');
+  if (token == null) throw Exception('User not logged in');
+
+  final response = await http.delete(
+    Uri.parse('$baseUrl/api/auth/deleteAccount/$userId'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode != 204) {
+    throw Exception('Failed to delete account');
+  }
 }
+}
+
+
+
+/* Future<bool> changePassword( String currentPassword, String newPassword) async {
+  final authToken = await getAuthToken();
+  if (authToken != null){
+     final response = await http.put(
+        Uri.parse('$baseUrl/api/auth/users'),
+        headers: {'Authorization': 'Bearer $authToken'},
+        body: jsonEncode(
+          {
+            'currentPassword': currentPassword,
+            'newPassword': newPassword,
+          }
+        )
+      );
+      if (response.statusCode == 200) {
+          return jsonDecode(response.body);
+        //return jsonDecode(response.body);
+      }
+  }
+        return false;
+} */
+
+    /* final response = await http.put(
+
+      Uri.parse('$baseUrl/api/auth/users'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      }),
+    ); */
+
+    /* if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    } */
+  
+ //}}
