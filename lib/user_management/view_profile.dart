@@ -196,7 +196,16 @@ class _ProfileViewState extends State<ProfileView> {
                   child: OutlinedButton(
                     onPressed: () async {try {
                 await AuthRepository().deleteAccount(userId);
-                Navigator.of(context).pop(); // Close the dialog
+
+        Navigator.of(context, rootNavigator: true).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => RepositoryProvider(
+              create: (context) => AuthRepository(),
+              child: const LoginView(),
+            ),
+          ),
+        );
+               /*  Navigator.of(context).pop(); */ // Close the dialog
                 // Log out user and redirect to login page or home page
               } catch (e) {
                 print("Error deleting account: $e");

@@ -23,8 +23,8 @@ class _SearchPostState extends State<SearchPost> {
       return postCardList.map((card) => {
         'username': card['user_name'] ?? '', 
         'userImage': card['profileImage'] ?? '',
-        'postImageOne': 'http://localhost:3000/media?media_id=${card['original_photo'] ?? ''}', 
-        'postImageTwo': 'http://localhost:3000/media?media_id=${card['reference_photo'] ?? ''}',        
+        'postImageOne': 'http://10.0.2.2:3000/media?media_id=${card['original_photo'] ?? ''}', 
+        'postImageTwo': 'http://10.0.2.2:3000/media?media_id=${card['reference_photo'] ?? ''}',        
         'status': card['artist_post'] ? "Upcycled by me" : "Looking for artist",
         'productName': card['name'] ?? '',
         'productPrice': card['price'] ?? '',
@@ -122,7 +122,7 @@ class PostWidget extends StatelessWidget {
                   ClipOval(
                       child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                           'http://localhost:3000/media?media_id=$userImage',
+                           'http://10.0.2.2:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
