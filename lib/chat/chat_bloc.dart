@@ -32,6 +32,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ReceiveMediaMessage>(_onReceiveMediaMessage);
     on<ReadyToFetchContacts>(_onReadyToFetchContacts);
     on<FetchChatHistory>(_onFetchChatHistory);
+    on<ClearBuffer>(_onClearBuffer);
+  }
+
+  Future<void> _onClearBuffer(ClearBuffer event, Emitter<ChatState> emit) async {
+    emit(state.copyWith(messages: {}));
   }
 
   Future<void> _onFetchChatHistory(

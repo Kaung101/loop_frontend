@@ -57,3 +57,10 @@ class FetchChatHistory extends ChatEvent {
 
   FetchChatHistory({required this.userId, required this.userName});
 }
+
+class ClearBuffer extends ChatEvent {
+  final String userId;
+  final String userName;
+
+  ClearBuffer({required this.userId, required this.userName});
+}

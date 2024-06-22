@@ -26,6 +26,8 @@ class DirectMessageView extends StatefulWidget {
 
 class _DirectMessageViewState extends State<DirectMessageView> {
   final TextEditingController _chatInputController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   Uint8List? _pickedFile;
   XFile? picked;
   final OverlayPortalController _overlayController = OverlayPortalController();
@@ -72,7 +74,8 @@ class _DirectMessageViewState extends State<DirectMessageView> {
       return List.from([]);
     }
 
-    return List.from(state.messages[widget.userId]!.map((message) {
+    return List.from(
+        state.messages[widget.userId]!.map((message) {
       if (message.from == widget.userId.item1) {
         return ReceivedMessageBubble(
             message: message.content,
@@ -93,6 +96,7 @@ class _DirectMessageViewState extends State<DirectMessageView> {
 
     context.read<ChatBloc>().add(FetchChatHistory(
         userId: widget.userId.item1, userName: widget.userId.item2));
+    context.read<ChatBloc>().add(ClearBuffer(userId: widget.userId.item1, userName: widget.userId.item2));
   }
 
   @override
@@ -132,10 +136,13 @@ class _DirectMessageViewState extends State<DirectMessageView> {
             child: Column(
               children: [
                 Expanded(
-                    child: ListView(children: [
-                  ..._buildHistory(state),
-                  ..._buildMessage(state)
-                ])),
+                    child: ListView(
+                        controller: _scrollController,
+                        reverse: true,
+                        children: [
+                      ..._buildMessage(state).reversed,
+                      ..._buildHistory(state).reversed,
+                    ])),
                 Row(children: [
                   Expanded(
                       child: TextField(
@@ -168,6 +175,9 @@ class _DirectMessageViewState extends State<DirectMessageView> {
                           to: widget.userId.item1,
                           toUser: widget.userId.item2));
                       _chatInputController.text = '';
+                      _scrollController.animateTo(0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut);
                     },
                   )),
                   IconButton(
