@@ -49,8 +49,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       List<Message> emptyList = [];
       originalMessages.addEntries([MapEntry(key, emptyList)]);
     }
-    final messagesOfUser = originalMessages[key];
-    messagesOfUser!.addAll(messages);
+    // final messagesOfUser = originalMessages[key];
+    // messagesOfUser = messages;
+    originalMessages[key] = messages;
     emit(state.copyWith(chatHistory: originalMessages));
   }
 

@@ -376,7 +376,7 @@ class ShowOwnerPost extends StatefulWidget {
 class _ShowOwnerPostState extends State<ShowOwnerPost> {
   final AuthRepository _authRepository = AuthRepository();
   late Future<List<dynamic>> _postFuture;
-  late String userId;
+  late String userId = '';
 
   @override
   void initState() {
