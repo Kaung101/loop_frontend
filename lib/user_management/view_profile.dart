@@ -152,7 +152,7 @@ class _ProfileViewState extends State<ProfileView> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
           backgroundColor: AppColors.backgroundColor,
           content: const Text(
@@ -174,7 +174,7 @@ class _ProfileViewState extends State<ProfileView> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryColor),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       backgroundColor: AppColors.backgroundColor,
                     ),
@@ -215,7 +215,7 @@ class _ProfileViewState extends State<ProfileView> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryColor),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       backgroundColor: AppColors.tertiaryColor,
                     ),
@@ -492,7 +492,7 @@ void _showDeletePostDialog(BuildContext context) {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
           backgroundColor: AppColors.backgroundColor,
           content: const Text(
@@ -514,7 +514,7 @@ void _showDeletePostDialog(BuildContext context) {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryColor),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       backgroundColor: AppColors.backgroundColor,
                     ),
@@ -559,7 +559,7 @@ void _showDeletePostDialog(BuildContext context) {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryColor),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       backgroundColor: AppColors.tertiaryColor,
                     ),
