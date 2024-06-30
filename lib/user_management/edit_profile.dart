@@ -23,7 +23,7 @@ class _EditProfileState extends State<EditProfile> {
 
   String _profilePhotoUrl = '';
   final AuthRepository _authRepository = AuthRepository();
-  String? userId;
+  String userId = '';
   @override
   void initState() {
     super.initState();
@@ -32,31 +32,29 @@ class _EditProfileState extends State<EditProfile> {
   //intially fetch user data
   Future<void> _fetchUserData() async {
     try {
+      print('fetching user data');
       final userData = await _authRepository.fetchUserData();
       print(userData);
       setState(() {
+        print(userData?['user']['id']);
         userId = userData?['user']['id'];
-        _fetchUpdateData();
+        _fetchUpdateData(userId);
       });
     } catch (e) {
       print('Error fetching user data: $e');
     }
   }
   //fetch user data after update
-  Future<void> _fetchUpdateData() async {
-    print(userId);
-    print('hid ');
+  Future<void> _fetchUpdateData(String userId) async {
     try {
       final userData =
-          await _authRepository.fetchOtherProfileData(userId: userId!);
-      //final userData = await _authRepository.fetchUserData();
-      print(userData);
+      await _authRepository.fetchOtherProfileData(userId: userId);
       setState(() {
-        _usernameController.text = userData?['username'];
-       _profilePhotoUrl = userData?['profileImage'];
-        _firstNameController.text= userData?['firstName'];
-       _lastNameController.text= userData?['lastName'];
-        _emailController.text= userData?['email'];
+        _usernameController.text = userData?['username'] ?? '';
+       _profilePhotoUrl = userData?['profileImage'] ?? '';
+        _firstNameController.text= userData?['firstName'] ?? '';
+       _lastNameController.text= userData?['lastName'] ?? '';
+        _emailController.text= userData?['email'] ?? '';
       });
     } catch (e) {
       print('Error fetching user data: $e');
