@@ -55,6 +55,7 @@ dependencies:
   firebase_core: ^3.1.0
   flutter_local_notifications: ^17.1.2
   firebase_analytics: ^11.0.1
+  shared_preferences: ^2.0.8
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -86,6 +87,9 @@ flutter:
   uses-material-design: true
   assets:
     - image/loop_logo.svg
+    - image/Asset 1.png
+    - image/Asset 2.png
+    - image/Asset 3.png
     - image/logo.png
     - image/appIcon.png
   # To add assets to your application, add an assets section, like this:

@@ -34,7 +34,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();
+   // _checkLoginStatus();
   }
 
   Future<void> _checkLoginStatus() async {

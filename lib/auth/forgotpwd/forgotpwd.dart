@@ -81,7 +81,7 @@ class _ForgotPasswordModalState extends State<ForgotPasswordModal> {
     final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
     final response = await http.post(url,
         headers: {
-          'origin': 'http://10.0.2.2',
+          'origin': 'http://54.254.8.87',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class NotificationRepository {
   final String baseUrl = const String.fromEnvironment('API_BASE_URL',
-      defaultValue: 'http://10.0.2.2:3000');
+      defaultValue: 'http://54.254.8.87:3000');
   final storage = const FlutterSecureStorage();
   Future<String> updateFcmToken({
     required String fcmToken,

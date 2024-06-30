@@ -6,6 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:loop/auth/auth_repo.dart';
 import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
+import 'package:loop/onbarding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../components/colors.dart'; // Assuming this file defines your app colors
 
 class SplashScreen extends StatefulWidget {
@@ -18,18 +20,27 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final storage = const FlutterSecureStorage();
   bool isLoggedIn = false;
+  bool isFirstTime = false;
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () => navigateToLogin(context));
+    checkAuthStatus();
   }
-  Future<void> checkAuthStatus() async {
-    String? token = await storage.read(key: 'jwt_token');
-    if (token != null) {
-      setState(() {
-        isLoggedIn = true;
-      });
-    }
+   Future<void> checkAuthStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? firstTime = prefs.getBool('isFirstTimeUser') ?? true;
+    String? token = await storage.read(key: 'jwtToken');
+
+    setState(() {
+      isFirstTime = firstTime;
+      isLoggedIn = token != null;
+      print(isLoggedIn);
+      print("is login");
+    });
+
+    Timer(const Duration(seconds: 2), () {
+      navigateToNextScreen(context);
+    });
   }
 
 
@@ -70,6 +81,29 @@ class _SplashScreenState extends State<SplashScreen> {
     ),
   );
 }
+void navigateToNextScreen(BuildContext context) {
+    if (isFirstTime) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const OnboardingView()),
+      );
+    } else if (isLoggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const BottomNav()),
+      );
+    } else {
+      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RepositoryProvider(
+                          create: (context) => AuthRepository(),
+                          child: const LoginView(),
+                        ),
+                      ),
+                    );
+    }
+  }
   void navigateToLogin(BuildContext context) {
     Navigator.pushReplacement(
       context,

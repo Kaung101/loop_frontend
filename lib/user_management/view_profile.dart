@@ -8,8 +8,10 @@ import 'package:loop/auth/login/login_view.dart';
 import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/components/colors.dart';
 import 'package:loop/components/editProfileNav.dart';
+import 'package:loop/showlist.dart';
 import 'package:loop/user_management/edit_profile.dart';
 import 'package:loop/user_management/change_password.dart';
+import 'package:loop/util/jwt.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -26,6 +28,7 @@ class _ProfileViewState extends State<ProfileView> {
   String? userId;
   String? _firstName;
   String? _lastName;
+  String? tempId;
 
   @override
   void initState() {
@@ -37,15 +40,25 @@ class _ProfileViewState extends State<ProfileView> {
     try {
       final userData = await _authRepository.fetchUserData();
       setState(() {
-        _username = userData?['user']['username'];
-        _profileImageUrl = userData?['user']['profileImage'];
-        userId = userData?['user']['_id'];
-        _firstName = userData?['user']['firstName'];
-        _lastName = userData?['user']['lastName'];
+        userId = userData?['user']['id'];
+        updateData();
       });
     } catch (e) {
       print('Error fetching user data: $e');
     }
+  }
+
+  Future<void> updateData() async {
+    print('update data');
+    print(userId);
+    final userData =
+        await _authRepository.fetchOtherProfileData(userId: userId!);
+    setState(() {
+      _username = userData?['username'];
+      _profileImageUrl = userData?['profileImage'];
+      _firstName = userData?['firstName'];
+      _lastName = userData?['lastName'];
+    });
   }
 
   Future<void> _signOut() async {
@@ -110,7 +123,7 @@ class _ProfileViewState extends State<ProfileView> {
                 backgroundImage: _profileImageUrl != null &&
                         _profileImageUrl!.isNotEmpty
                     ? NetworkImage(
-                        'http://10.0.2.2:3000/media?media_id=$_profileImageUrl')
+                        'http://54.254.8.87:3000/media?media_id=$_profileImageUrl')
                     : const AssetImage('image/logo.png') as ImageProvider,
               ),
             ),
@@ -194,23 +207,25 @@ class _ProfileViewState extends State<ProfileView> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () async {try {
-                await AuthRepository().deleteAccount(userId);
+                    onPressed: () async {
+                      try {
+                        await AuthRepository().deleteAccount(userId);
 
-        Navigator.of(context, rootNavigator: true).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => RepositoryProvider(
-              create: (context) => AuthRepository(),
-              child: const LoginView(),
-            ),
-          ),
-        );
-               /*  Navigator.of(context).pop(); */ // Close the dialog
-                // Log out user and redirect to login page or home page
-              } catch (e) {
-                print("Error deleting account: $e");
-                // Optionally show an error message to the user
-              }
+                        Navigator.of(context, rootNavigator: true)
+                            .pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => RepositoryProvider(
+                              create: (context) => AuthRepository(),
+                              child: const LoginView(),
+                            ),
+                          ),
+                        );
+                        /*  Navigator.of(context).pop(); */ // Close the dialog
+                        // Log out user and redirect to login page or home page
+                      } catch (e) {
+                        print("Error deleting account: $e");
+                        // Optionally show an error message to the user
+                      }
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.primaryColor),
@@ -384,7 +399,7 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
     _postFuture = getAllPost();
     _authRepository.fetchUserData().then((userData) {
       setState(() {
-        userId = userData?['user']['_id'];
+        userId = userData?['user']['id'];
       });
     });
     refreshPosts();
@@ -399,9 +414,9 @@ class _ShowOwnerPostState extends State<ShowOwnerPost> {
               username: post['user_name'] ?? '',
               userImage: post['profileImage'] ?? '',
               postImageOne:
-                  'http://10.0.2.2:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
+                  'http://54.254.8.87:3000/media?media_id=${post['original_photo']}', // Replace with actual data if available
               postImageTwo:
-                  'http://10.0.2.2:3000/media?media_id=${post['reference_photo']}',
+                  'http://54.254.8.87:3000/media?media_id=${post['reference_photo']}',
               status: post['artist_post'] == false
                   ? 'Looking for artist'
                   : 'Upcycled by Me',
@@ -478,15 +493,14 @@ class PostWidget extends StatelessWidget {
     'Delete Post',
   ];
  */
-  
-void _deletPostTest(){
-  final AuthRepository _authRepository = AuthRepository();
-  _authRepository.deletePost(postId);
-  print("delete");
-  
-}
 
-void _showDeletePostDialog(BuildContext context) {
+  void _deletPostTest() {
+    final AuthRepository _authRepository = AuthRepository();
+    _authRepository.deletePost(postId);
+    print("delete");
+  }
+
+  void _showDeletePostDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -534,26 +548,27 @@ void _showDeletePostDialog(BuildContext context) {
                 const SizedBox(width: 10),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: (){
+                    onPressed: () {
                       print("delete");
-                       _deletPostTest();
-                       Navigator.of(context).pop();
-                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Post deleted successfully'),)                
-                       );
-                      //  Navigator.of(context, 
-                      //  ).pushReplacement(
-                      //    MaterialPageRoute(
-                      //      builder: (context) => const ProfileView(),
-                      //    ),
-                      //  );
+                      _deletPostTest();
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Post deleted successfully'),
+                      ));
+                      Navigator.of(context, rootNavigator: true)
+                          .pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => RepositoryProvider(
+                            create: (context) => AuthRepository(),
+                            child: const BottomNav(),
+                          ),
+                        ),
+                      );
 
-                       
-
-                       //_ShowOwnerPostState().getAllPost();
+                      //_ShowOwnerPostState().getAllPost();
                       //want to add refresh mehtod here
-                    //_ShowOwnerPostState().refreshPosts();
-                        //refresh getAllPost here
+                      //_ShowOwnerPostState().refreshPosts();
+                      //refresh getAllPost here
                       //deletePost(postId: postId);
                     },
                     style: OutlinedButton.styleFrom(
@@ -583,6 +598,7 @@ void _showDeletePostDialog(BuildContext context) {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -606,14 +622,14 @@ void _showDeletePostDialog(BuildContext context) {
                   ClipOval(
                     child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                            'http://10.0.2.2:3000/media?media_id=$userImage',
+                            'http://54.254.8.87:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
                           )
                         : Image.asset('image/logo.png', width: 60, height: 60),
                   ),
-                  const SizedBox(width:2),
+                  const SizedBox(width: 2),
                   TextButton(
                     style: ButtonStyle(
                       overlayColor: MaterialStateProperty.resolveWith<Color?>(
@@ -843,7 +859,7 @@ void _showDeletePostDialog(BuildContext context) {
 class DropDown extends StatefulWidget {
   final String postId;
   final bool showOnFeed;
-  const DropDown({super.key, required this.postId , required this.showOnFeed});
+  const DropDown({super.key, required this.postId, required this.showOnFeed});
   @override
   DropDownState createState() => DropDownState();
 }
@@ -855,6 +871,7 @@ class DropDownState extends State<DropDown> {
     super.initState();
     dropdownValue = widget.showOnFeed == true ? 'Show Post' : 'Hide from Feed';
   }
+
   final List<String> _items = [
     'Show Post',
     'Hide from Feed',

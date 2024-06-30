@@ -29,17 +29,34 @@ class _EditProfileState extends State<EditProfile> {
     super.initState();
     _fetchUserData();
   }
-
+  //intially fetch user data
   Future<void> _fetchUserData() async {
     try {
       final userData = await _authRepository.fetchUserData();
+      print(userData);
       setState(() {
-        userId = userData?['user']['_id'];
-        _usernameController.text = userData?['user']['username'] ?? '';
-        _profilePhotoUrl = userData?['user']['profileImage'] ?? '';
-        _emailController.text = userData?['user']['email'] ?? '';
-        _firstNameController.text = userData?['user']['firstName'] ?? '';
-        _lastNameController.text = userData?['user']['lastName'] ?? '';
+        userId = userData?['user']['id'];
+        _fetchUpdateData();
+      });
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+  //fetch user data after update
+  Future<void> _fetchUpdateData() async {
+    print(userId);
+    print('hid ');
+    try {
+      final userData =
+          await _authRepository.fetchOtherProfileData(userId: userId!);
+      //final userData = await _authRepository.fetchUserData();
+      print(userData);
+      setState(() {
+        _usernameController.text = userData?['username'];
+       _profilePhotoUrl = userData?['profileImage'];
+        _firstNameController.text= userData?['firstName'];
+       _lastNameController.text= userData?['lastName'];
+        _emailController.text= userData?['email'];
       });
     } catch (e) {
       print('Error fetching user data: $e');
@@ -62,6 +79,7 @@ class _EditProfileState extends State<EditProfile> {
           backgroundColor: AppColors.tertiaryColor,
         ),
       );
+      _fetchUserData();
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -80,6 +98,7 @@ class _EditProfileState extends State<EditProfile> {
       setState(() {
         _profileImageBytes = bytes;
       });
+      print('from outside');
       // Implement upload image logic
       var res = await _authRepository.editProfileImage(
           image: pickedFile, userId: userId!);
@@ -138,7 +157,7 @@ class _EditProfileState extends State<EditProfile> {
                             )
                           : (_profilePhotoUrl.isNotEmpty
                               ? Image.network(
-                                  'http://10.0.2.2:3000/media?media_id=$_profilePhotoUrl',
+                                  'http://54.254.8.87:3000/media?media_id=$_profilePhotoUrl',
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     print("Error loading image: $error");

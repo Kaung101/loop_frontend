@@ -70,7 +70,7 @@ Future<void> setupFlutterNotifications() async {
 
 Future<void> showFlutterNotification(RemoteMessage message) async {
   BigPictureStyleInformation? bigPictureStyleInformation;
-  if (message.data['body']!.startsWith('http://10.0.2.2')) {
+  if (message.data['body']!.startsWith('http://54.254.8.87')) {
     final http.Response response =
         await http.get(Uri.parse(message.data['body']));
     bigPictureStyleInformation = BigPictureStyleInformation(

@@ -10,7 +10,7 @@ import 'package:loop/user_management/view_profile.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 class AuthRepository {
-  final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:3000');
+  final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://54.254.8.87:3000');
   final storage = const  FlutterSecureStorage();
   Future<String> login({required String email, required String password}) async {
     
@@ -72,7 +72,7 @@ Future<void> logoutUser(String token) async {
   }
 
   Future<bool> isLoggedIn() async {
-    final token = await storage.read(key: 'jwt');
+    final token = await storage.read(key: 'jwtToken');
     if (token == null) return false;
 
     // Check token validity
@@ -111,6 +111,8 @@ Future<void> logoutUser(String token) async {
         headers: {'Authorization': 'Bearer $authToken'},
       );
       if (response.statusCode == 200) {
+        print('body');
+         print(response.body);
           return jsonDecode(response.body);
         //return jsonDecode(response.body);
       }
@@ -210,7 +212,7 @@ Future<void> logoutUser(String token) async {
     final imageStr = base64Encode(await bytes);
     final String? imageMime = lookupMimeType(image.path);
     final imageMimeType = MediaType.parse(imageMime!);
-
+    
     final response = await http.put(
       Uri.parse('$baseUrl/api/auth/editProfileImage'),
       headers: {'Content-Type': 'application/json'},
@@ -227,62 +229,12 @@ Future<void> logoutUser(String token) async {
     return false;
   }
 
-/* 
-  //edit profile
-  Future<bool> editProfile({required String firstName, required String lastName, required String username, required String email}) async{
-    final response = await http.put(
-      Uri.parse('$baseUrl/api/auth/editProfile'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'firstName': firstName,
-        'lastName': lastName,
-        'username': username,}),
-    );
-    if(response.body == 'true'){
-      return true;
-  }  
-  return false;
-  } */
-
-  // Future<String?> uploadProfilePhoto(Uint8List imageBytes) async {
-  //   final uploadUrl = '$baseUrl/api/auth/me'; // Replace with your actual API endpoint
-  //   try {
-  //     final request = http.MultipartRequest('POST', Uri.parse(uploadUrl))
-  //       ..files.add(
-  //         http.MultipartFile.fromBytes(
-  //           'file',
-  //           imageBytes,
-  //           filename: 'profile_photo.png',
-  //           contentType: MediaType('image', 'png'),
-  //         ),
-  //       );
-
-  //     final response = await request.send();
-
-  //     if (response.statusCode == 200) {
-  //       final responseBody = await http.Response.fromStream(response);
-  //       final responseData = json.decode(responseBody.body);
-  //       return responseData['url'];
-  //     } else {
-  //       print('Failed to upload profile photo. Status code: ${response.statusCode}');
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     print('Upload error: $e');
-  //     return null;
-  //   }
-  // }
 Future<String?> uploadProfilePhoto( {required XFile profilePhoto}) async {
     final token = await storage.read(key: 'jwtToken');
     if(token == null) return "User is not loggined";
     final String? photomime = lookupMimeType(profilePhoto.path);
     final photomimeType = MediaType.parse(photomime!);
-    /* final formData = FormData.fromMap(
-      {
-        'profile_photo': await MultipartFile.fromFile(profilePhoto.path, contentType: photomimeType),
-      }
-    ); */
+  
     final dio = Dio();
 
     try{
@@ -307,25 +259,6 @@ Future<String?> uploadProfilePhoto( {required XFile profilePhoto}) async {
   }
 
 
-  /* Future<List<Map<String, dynamic>>> fetchUsers(String baseUrl, {String? searchQuery}) async {
-  try {
-    final response = await http.get(Uri.parse('$baseUrl/api/auth/users'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      
-      // Filter users based on search query
-      if (searchQuery != null && searchQuery.isNotEmpty) {
-        data = data.where((user) => user['username'].toLowerCase().contains(searchQuery.toLowerCase())).toList();
-      }
-      
-      return data.cast<Map<String, dynamic>>();
-    } else {
-      throw Exception('Failed to fetch users');
-    }
-  } catch (e) {
-    throw Exception('Error: $e');
-  }
-} */
 
 Future<List<Map<String, dynamic>>> fetchUsers(String? searchQuery) async {
   try {
@@ -475,45 +408,3 @@ Future<List<Map<String, dynamic>>> fetchPosts(String? searchQuery) async {
 }
 }
 
-
-
-/* Future<bool> changePassword( String currentPassword, String newPassword) async {
-  final authToken = await getAuthToken();
-  if (authToken != null){
-     final response = await http.put(
-        Uri.parse('$baseUrl/api/auth/users'),
-        headers: {'Authorization': 'Bearer $authToken'},
-        body: jsonEncode(
-          {
-            'currentPassword': currentPassword,
-            'newPassword': newPassword,
-          }
-        )
-      );
-      if (response.statusCode == 200) {
-          return jsonDecode(response.body);
-        //return jsonDecode(response.body);
-      }
-  }
-        return false;
-} */
-
-    /* final response = await http.put(
-
-      Uri.parse('$baseUrl/api/auth/users'),
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        'currentPassword': currentPassword,
-        'newPassword': newPassword,
-      }),
-    ); */
-
-    /* if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    } */
-  
- //}}
