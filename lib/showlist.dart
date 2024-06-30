@@ -38,8 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
       username: post['user_name'] ?? '',
       userId: post['user'] ?? '',
       userImage: post['profileImage'] ?? '',
-      postImageOne: 'http://54.254.8.87:3000/media?media_id=${post['original_photo'] ?? ''}',
-      postImageTwo: 'http://54.254.8.87:3000/media?media_id=${post['reference_photo'] ?? ''}',
+      postImageOne: 'http://54.254.8.87/media?media_id=${post['original_photo'] ?? ''}',
+      postImageTwo: 'http://54.254.8.87/media?media_id=${post['reference_photo'] ?? ''}',
       status: post['artist_post'] ? "Upcycled by me" : "Looking for artist",
       productName: post['name'] ?? '',
       productPrice: post['price'] ?? '',
@@ -199,7 +199,7 @@ class PostWidget extends StatelessWidget {
                     ClipOval(
                       child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                           'http://54.254.8.87:3000/media?media_id=$userImage',
+                           'http://54.254.8.87/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,

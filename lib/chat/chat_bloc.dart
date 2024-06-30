@@ -13,7 +13,7 @@ import 'package:tuple/tuple.dart';
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository chatRepository;
   IO.Socket socket = IO.io(
-      'http://54.254.8.87:3000',
+      'http://54.254.8.87',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

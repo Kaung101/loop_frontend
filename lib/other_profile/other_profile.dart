@@ -114,7 +114,7 @@ class _OtherProfileState extends State<OtherProfile> {
                 backgroundImage: _profileImageUrl != null &&
                         _profileImageUrl!.isNotEmpty
                     ? NetworkImage(
-                        'http://54.254.8.87:3000/media?media_id=$_profileImageUrl')
+                        'http://54.254.8.87/media?media_id=$_profileImageUrl')
                     : const AssetImage('image/logo.png') as ImageProvider,
               ),
             ),
@@ -221,10 +221,10 @@ class ShowOtherPost extends StatelessWidget {
               userImage: post['profileImage'] ?? '',
               // Replace with actual data if available
               postImageOne:
-                  'http://54.254.8.87:3000/media?media_id=${post['original_photo']}',
+                  'http://54.254.8.87/media?media_id=${post['original_photo']}',
               // Replace with actual data if available
               postImageTwo:
-                  'http://54.254.8.87:3000/media?media_id=${post['reference_photo']}',
+                  'http://54.254.8.87/media?media_id=${post['reference_photo']}',
               // Replace with actual data if available
               status: post['artist_post'] == false
                   ? "Looking for artisit"
@@ -319,7 +319,7 @@ class PostWidget extends StatelessWidget {
                     ClipOval(
                       child: userImage != 'null' && userImage.isNotEmpty
                           ? Image.network(
-                              'http://54.254.8.87:3000/media?media_id=$userImage',
+                              'http://54.254.8.87/media?media_id=$userImage',
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
