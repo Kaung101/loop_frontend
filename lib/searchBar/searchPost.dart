@@ -23,7 +23,7 @@ class _SearchPostState extends State<SearchPost> {
     super.initState();
     authRepository.fetchUserData().then((value) {
       setState(() {
-        ownerUserId = value?['user']['_id'];
+        ownerUserId = value?['user']['id'];
       });
     });
   }
@@ -174,8 +174,8 @@ class PostWidget extends StatelessWidget {
                       onPressed: (){
                         Navigator.push(
                         context, MaterialPageRoute(
-                          builder: (context) => ownerUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
-                          settings: ownerUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                          builder: (context) => ownerUserId.toString() == userId.toString() ? const ProfileNav() : OtherProfile(userId: userId),
+                          settings: ownerUserId.toString() == userId.toString() ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
                       ));
                       },
                        child: Text(

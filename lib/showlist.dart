@@ -27,7 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
     refreshPosts();
     authRepository.fetchUserData().then((userData) {
       setState(() {
-        ownUserId = userData?['user']['_id'];
+        //check ownerId
+        ownUserId = userData?['user']['id'];
       });
     });
   }
@@ -188,8 +189,8 @@ class PostWidget extends StatelessWidget {
 
                   Navigator.push(
                     context, MaterialPageRoute(
-                      builder: (context) => ownUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
-                      settings: ownUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                      builder: (context) => ownUserId.toString() == userId.toString() ? const ProfileNav() : OtherProfile(userId: userId),
+                      settings: ownUserId.toString() == userId.toString() ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
                   ));
                  // print("User ID from post widget: $userId");
                   //print("Own User ID from post widget: $ownUserId");
@@ -224,7 +225,7 @@ class PostWidget extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                     context, MaterialPageRoute(
-                      builder: (context) => ownUserId == userId ? ProfileNav() : OtherProfile(userId: userId),
+                      builder: (context) => ownUserId.toString() == userId.toString() ? ProfileNav() : OtherProfile(userId: userId),
                   ));
                       },
                       child: Text(

@@ -44,7 +44,7 @@ class _searchUserState extends State<searchUser> {
     super.initState();
     authRepository.fetchUserData().then((value) {
       setState(() {
-        ownerUserId = value?['user']['_id'];
+        ownerUserId = value?['user']['id'];
       });
     });
   }
@@ -181,8 +181,8 @@ class searchCard extends StatelessWidget{
                   onPressed: (){
                     Navigator.push(
                     context, MaterialPageRoute(
-                      builder: (context) => ownUserId == userId ? const ProfileNav() : OtherProfile(userId: userId),
-                      settings: ownUserId == userId ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
+                      builder: (context) => ownUserId.toString() == userId.toString() ? const ProfileNav() : OtherProfile(userId: userId),
+                      settings: ownUserId.toString() == userId.toString() ? RouteSettings(name: '/viewProfile') : RouteSettings(name: ''),
                   ));
                   },
                   child: Text(
