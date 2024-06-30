@@ -14,14 +14,20 @@ class NotificationRepository {
     final token = await storage.read(key: 'jwtToken');
     if (token == null) return 'User is not logged in!';
     if  (fcmToken.isEmpty) return 'Not connected with firebase!';
-
+     print(token);
+     print("token from here");
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/api/auth/update_fcm'),
-          headers: {'Authorization': "Bearer $token"},
-        body: {
+        
+        headers: {'Authorization': "Bearer $token", 'Content-Type': 'application/json'},
+        body: jsonEncode({
           'fcm_token': fcmToken,
-        },
+        }),
+        // body: {
+          //'fcm_token': fcmToken,
+        //   'fcm_token': "5555555",
+        // },
       );
       if(response.statusCode == 200){
       } else {
