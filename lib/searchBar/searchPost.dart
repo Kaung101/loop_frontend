@@ -37,8 +37,8 @@ class _SearchPostState extends State<SearchPost> {
         'userId': card['user'] ?? '',
         'username': card['user_name'] ?? '',
         'userImage': card['profileImage'] ?? '',
-        'postImageOne': 'http://54.254.8.87/media?media_id=${card['original_photo'] ?? ''}',
-        'postImageTwo': 'http://54.254.8.87/media?media_id=${card['reference_photo'] ?? ''}',
+        'postImageOne': 'http://54.254.8.87:3000/media?media_id=${card['original_photo'] ?? ''}',
+        'postImageTwo': 'http://54.254.8.87:3000/media?media_id=${card['reference_photo'] ?? ''}',
         'status': card['artist_post'] ? "Upcycled by me" : "Looking for artist",
         'productName': card['name'] ?? '',
         'productPrice': card['price'] ?? '',
@@ -149,7 +149,7 @@ class PostWidget extends StatelessWidget {
                     ClipOval(
                         child: userImage != 'null' && userImage.isNotEmpty
                           ? Image.network(
-                             'http://54.254.8.87/media?media_id=$userImage',
+                             'http://54.254.8.87:3000/media?media_id=$userImage',
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,

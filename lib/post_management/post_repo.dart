@@ -6,7 +6,7 @@ import 'package:http_parser/http_parser.dart' show MediaType;
 
 class PostRepository {
   final String baseUrl = const String.fromEnvironment('API_BASE_URL',
-      defaultValue: 'http://54.254.8.87');
+      defaultValue: 'http://54.254.8.87:3000');
   final storage = const FlutterSecureStorage();
 
   Future<String> createPost({

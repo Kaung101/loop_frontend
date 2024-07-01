@@ -155,7 +155,7 @@ class _EditProfileState extends State<EditProfile> {
                             )
                           : (_profilePhotoUrl.isNotEmpty
                               ? Image.network(
-                                  'http://54.254.8.87/media?media_id=$_profilePhotoUrl',
+                                  'http://54.254.8.87:3000/media?media_id=$_profilePhotoUrl',
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     print("Error loading image: $error");

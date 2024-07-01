@@ -13,7 +13,6 @@ import 'package:loop/components/bottomNavigation.dart';
 import 'package:loop/chat/chat_bloc.dart';
 import 'package:loop/chat/chat_event.dart';
 import '../../Notification/notification_bloc.dart';
-import 'package:loop/showlist.dart';
 import '../../Notification/notification_event.dart';
 import '../../components/colors.dart';
 
@@ -219,8 +218,8 @@ class _LoginViewState extends State<LoginView> {
                   fontSize: 16.0,
                 );
                 context.read<ChatBloc>().add(ChatUserLoggedIn());
-                      context.read<NotificationBloc>().add(NotificationUserLoggedIn());
-                      context.read<ChatBloc>().add(ReadyToFetchContacts());
+                context.read<NotificationBloc>().add(NotificationUserLoggedIn());
+                context.read<ChatBloc>().add(ReadyToFetchContacts());
                 Future.delayed(const Duration(seconds: 1), () {
                   Navigator.push(
                     context,

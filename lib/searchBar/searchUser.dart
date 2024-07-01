@@ -24,7 +24,7 @@ class _searchUserState extends State<searchUser> {
 
   /*    Future<List<Map<String, dynamic>>> getAllUsers(String searchQuery) async {
     try {
-      return await authRepository.fetchUsers( 'http://54.254.8.87',  searchQuery: searchQuery);
+      return await authRepository.fetchUsers( 'http://54.254.8.87:3000',  searchQuery: searchQuery);
     } catch (e) {
       print('Error fetching users: $e');
       return [];
@@ -164,7 +164,7 @@ class searchCard extends StatelessWidget{
                 ClipOval(
                   child: userImage != 'null' && userImage.isNotEmpty
                   ? Image.network(
-                    'http://54.254.8.87/media?media_id=$userImage',
+                    'http://54.254.8.87:3000/media?media_id=$userImage',
                     width: 64,
                     height: 64,
                     fit: BoxFit.cover,

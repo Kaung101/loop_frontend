@@ -39,8 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
       username: post['user_name'] ?? '',
       userId: post['user'] ?? '',
       userImage: post['profileImage'] ?? '',
-      postImageOne: 'http://54.254.8.87/media?media_id=${post['original_photo'] ?? ''}',
-      postImageTwo: 'http://54.254.8.87/media?media_id=${post['reference_photo'] ?? ''}',
+      postImageOne: 'http://54.254.8.87:3000/media?media_id=${post['original_photo'] ?? ''}',
+      postImageTwo: 'http://54.254.8.87:3000/media?media_id=${post['reference_photo'] ?? ''}',
       status: post['artist_post'] ? "Upcycled by me" : "Looking for artist",
       productName: post['name'] ?? '',
       productPrice: post['price'] ?? '',
@@ -74,49 +74,87 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
             child: AbsorbPointer(
-              absorbing: true,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  suffixIcon: Container(
-                    margin: const EdgeInsets.only(right: 10.0),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
-                        elevation: MaterialStateProperty.all(0),
-                      ),
-                      onPressed: () {
-
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => const searchScreen(),
-                                      settings: const RouteSettings(name: '/changePw'),
-                                    ),
-                                  );
-                      },
-                      child: const Icon(CupertinoIcons.search, color: AppColors.textColor),
-                    ),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: AppColors.textColor),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: AppColors.textColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: AppColors.textColor),
-                  ),
-                  filled: true,
-                  fillColor: AppColors.backgroundColor,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 18.0),
-                ),
-                style: const TextStyle(color: AppColors.textColor),
-                cursorColor: AppColors.textColor,
-              ),
+  absorbing: true,
+  child: TextField(
+    decoration: InputDecoration(
+      hintText: 'Search',
+      suffixIcon: IconButton(
+        padding: const EdgeInsets.all(0), // Remove any padding
+        icon: const Icon(CupertinoIcons.search, color: AppColors.textColor),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const searchScreen(),
+              settings: const RouteSettings(name: '/changePw'),
             ),
+          );
+        },
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: AppColors.textColor),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: AppColors.textColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        borderSide: const BorderSide(color: AppColors.textColor),
+      ),
+      filled: true,
+      fillColor: AppColors.backgroundColor,
+      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 18.0),
+    ),
+    style: const TextStyle(color: AppColors.textColor),
+    cursorColor: AppColors.textColor,
+  ),
+),
+
+            // child: AbsorbPointer(
+            //   absorbing: true,
+            //   child: TextField(
+            //     decoration: InputDecoration(
+            //       hintText: 'Search',
+            //       suffixIcon: Container(
+            //         margin: const EdgeInsets.only(right: 10.0),
+            //         child: ElevatedButton(
+            //           style: ButtonStyle(
+            //             backgroundColor: MaterialStateProperty.all<Color>(AppColors.backgroundColor),
+            //             elevation: MaterialStateProperty.all(0),
+            //           ),
+            //           onPressed: () {
+
+            //                       Navigator.of(context).push(
+            //                         MaterialPageRoute(
+            //                           builder: (context) => const searchScreen(),
+            //                           settings: const RouteSettings(name: '/changePw'),
+            //                         ),
+            //                       );
+            //           },
+            //           child: const Icon(CupertinoIcons.search, color: AppColors.textColor,),
+            //         ),
+            //       ),
+            //       border: OutlineInputBorder(
+            //         borderRadius: BorderRadius.circular(10.0),
+            //         borderSide: const BorderSide(color: AppColors.textColor),
+            //       ),
+            //       enabledBorder: OutlineInputBorder(
+            //         borderRadius: BorderRadius.circular(10.0),
+            //         borderSide: const BorderSide(color: AppColors.textColor),
+            //       ),
+            //       focusedBorder: OutlineInputBorder(
+            //         borderRadius: BorderRadius.circular(10.0),
+            //         borderSide: const BorderSide(color: AppColors.textColor),
+            //       ),
+            //       filled: true,
+            //       fillColor: AppColors.backgroundColor,
+            //       contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 18.0),
+            //     ),
+            //     style: const TextStyle(color: AppColors.textColor),
+            //     cursorColor: AppColors.textColor,
+            //   ),
+            // ),
           ),
         ),
       ),
@@ -200,7 +238,7 @@ class PostWidget extends StatelessWidget {
                     ClipOval(
                       child: userImage != 'null' && userImage.isNotEmpty
                         ? Image.network(
-                           'http://54.254.8.87/media?media_id=$userImage',
+                           'http://54.254.8.87:3000/media?media_id=$userImage',
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
@@ -263,9 +301,17 @@ class PostWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                            const Text(
-                              'Original Product',
-                              style: TextStyle(
+                            // const Text(
+                            //   'Original Product',
+                            //   style: TextStyle(
+                            //     fontWeight: FontWeight.bold,
+                            //   ),
+                            // ),
+                            Text(
+                              (status) == 'Looking for artist'
+                                  ? 'Original Product'
+                                  : 'Before',
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -299,9 +345,17 @@ class PostWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8.0),
-                            const Text(
-                              'Reference',
-                              style: TextStyle(
+                            // const Text(
+                            //   'Reference',
+                            //   style: TextStyle(
+                            //     fontWeight: FontWeight.bold,
+                            //   ),
+                            // ),
+                             Text(
+                              (status) == 'Looking for artist'
+                                  ? 'Reference'
+                                  : 'After',
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

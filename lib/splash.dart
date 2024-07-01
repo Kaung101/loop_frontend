@@ -87,12 +87,14 @@ void navigateToNextScreen(BuildContext context) {
         context,
         MaterialPageRoute(builder: (context) => const OnboardingView()),
       );
-    } else if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const BottomNav()),
-      );
-    } else {
+    } 
+    // else if (isLoggedIn) {
+    //   Navigator.pushReplacement(
+    //     context,
+    //     MaterialPageRoute(builder: (context) => const BottomNav()),
+    //   );
+    // }
+     else {
       Navigator.push(
                       context,
                       MaterialPageRoute(
